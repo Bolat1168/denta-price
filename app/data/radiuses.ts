@@ -1,0 +1,1 @@
+export const radiuses = ['1 км', '3 км', '6 км', 'City'] as const;
