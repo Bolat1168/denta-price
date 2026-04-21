@@ -1,7 +1,8 @@
 ﻿import admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
+import path from 'path';
 
-const serviceAccount = require('E:/denta-price_01/firebase-key.json');
+const serviceAccount = require(path.join(process.cwd(), 'firebase-key.json'));
 
 if (!admin.apps.length) {
   admin.initializeApp({
