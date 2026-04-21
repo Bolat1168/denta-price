@@ -17,9 +17,9 @@ const db = getFirestore();
 
 // Создаём OAuth2 клиент для обмена кода на токен
 const googleClient = new OAuth2Client(
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  'postmessage' // должно совпадать с redirect_uri на фронте
+  'http://localhost:3000/api/auth/google/callback'
 );
 
 export async function POST(req: Request) {
@@ -65,18 +65,15 @@ export async function POST(req: Request) {
         updatedAt: new Date().toISOString(),
       });
     } else {
-      await docRef.set(
-        {
-          fullName: name || docSnap.data()?.fullName,
-          photoUrl: picture || docSnap.data()?.photoUrl,
-          email: email || docSnap.data()?.email,
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      );
+      await docRef.update({
+        fullName: name || docSnap.data()?.fullName,
+        photoUrl: picture || docSnap.data()?.photoUrl,
+        email: email || docSnap.data()?.email,
+        updatedAt: new Date().toISOString(),
+      });
     }
 
-    return NextResponse.json({ dentistId });
+    return NextResponse.json({ success: true, dentistId });
   } catch (error) {
     console.error('Google auth error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

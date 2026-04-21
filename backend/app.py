@@ -3,17 +3,18 @@ from flask_cors import CORS
 import sqlite3
 import uuid
 import requests
+import hashlib
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-# === KASSA24 ===
-MERCHANT_ID = "ВАШ_MERCHANT_ID"
-API_KEY = "ВАШ_API_KEY"
-API_URL = "https://ecommerce.pult24.kz/payment/create"
+# === FREEDOM PAY НАСТРОЙКИ ===
+MERCHANT_ID = "584579"
+SECRET_KEY = f2mT0dG23BDG3sqq
+API_URL = "https://api.freedompay.kz/init_payment"
 
-# === БАЗА ДАННЫХ ===
+# === БАЗА ДАННЫХ (БЕЗ ИЗМЕНЕНИЙ) ===
 def init_db():
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
@@ -30,7 +31,16 @@ def init_db():
 
 init_db()
 
-# === ПОЛУЧИТЬ ДАННЫЕ ВРАЧА ===
+# === ФУНКЦИЯ ДЛЯ ПОДПИСИ FREEDOM PAY ===
+def make_pg_sig(script_name, params, secret_key):
+    sorted_params = sorted(params.items())
+    values = [str(v) for k, v in sorted_params]
+    values.insert(0, script_name)
+    values.append(secret_key)
+    signature_string = ';'.join(values)
+    return hashlib.md5(signature_string.encode()).hexdigest()
+
+# === ПОЛУЧИТЬ ДАННЫЕ ВРАЧА (БЕЗ ИЗМЕНЕНИЙ) ===
 @app.route('/api/dentists/<dentist_id>', methods=['GET'])
 def get_dentist(dentist_id):
     conn = sqlite3.connect('data.db')
@@ -43,7 +53,7 @@ def get_dentist(dentist_id):
     conn.close()
     return jsonify({'dentistId': dentist_id, 'fullName': full_name, 'photoUrl': photo_url, 'whatsapp': whatsapp, 'address': address, 'services': services})
 
-# === СОХРАНИТЬ ДАННЫЕ ВРАЧА ===
+# === СОХРАНИТЬ ДАННЫЕ ВРАЧА (БЕЗ ИЗМЕНЕНИЙ) ===
 @app.route('/api/dentists/<dentist_id>', methods=['PUT'])
 def put_dentist(dentist_id):
     data = request.json
@@ -59,7 +69,7 @@ def put_dentist(dentist_id):
     conn.close()
     return jsonify({'success': True})
 
-# === СОЗДАТЬ ПЛАТЁЖ ===
+# === СОЗДАТЬ ПЛАТЁЖ (FREEDOM PAY) ===
 @app.route('/api/promo-payments', methods=['POST'])
 def promo_payments():
     data = request.json
@@ -67,44 +77,82 @@ def promo_payments():
     service_id = data.get('serviceId')
     radius = data.get('radius')
     amount = data.get('amount')
+    doctor_name = data.get('doctorName', 'Врач')
+    
     if not all([dentist_id, service_id, radius, amount]):
         return jsonify({'error': 'Missing fields'}), 400
+    
     slot_id = str(uuid.uuid4())
+    
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
     c.execute('INSERT INTO slots (id, dentist_id, service_id, radius, amount, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
               (slot_id, dentist_id, service_id, radius, amount, 'pending', datetime.now().isoformat()))
     conn.commit()
     conn.close()
-    payload = {
-        'merchantId': MERCHANT_ID,
-        'orderID': slot_id,
-        'amount': amount,
-        'description': f'{service_id} - {radius}',
-        'callbackUrl': 'https://denta-price.pro/api/callback'
+    
+    # Параметры для Freedom Pay
+    params = {
+        'pg_merchant_id': MERCHANT_ID,
+        'pg_order_id': slot_id,
+        'pg_amount': amount,
+        'pg_description': f'Payment for dentist advertising slot. Service: {service_id}, Radius: {radius}, Amount: {amount} KZT from {doctor_name}',
+        'pg_salt': str(uuid.uuid4()),
+        'pg_payment_route': 'frame',
+        'pg_result_url': 'https://denta-price.pro/api/freedompay/result',
+        'pg_success_url': 'https://denta-price.pro/api/freedompay/success',
+        'pg_failure_url': 'https://denta-price.pro/api/freedompay/failure'
     }
-    headers = {'Content-Type': 'application/json'}
+    
+    # Подпись
+    params['pg_sig'] = make_pg_sig('init_payment.php', params, SECRET_KEY)
+    
     try:
-        r = requests.post(API_URL, json=payload, headers=headers, auth=(MERCHANT_ID, API_KEY))
-        if r.status_code == 200:
-            payment_url = r.json().get('url')
+        response = requests.post(API_URL, data=params)
+        if response.status_code == 200:
+            payment_url = f"https://api.freedompay.kz/payment_page?pg_order_id={slot_id}"
             return jsonify({'success': True, 'paymentRecordId': slot_id, 'paymentUrl': payment_url})
-        return jsonify({'error': 'Kassa24 error', 'details': r.text}), 500
+        else:
+            return jsonify({'error': 'Freedom Pay error', 'details': response.text}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# === CALLBACK ===
-@app.route('/api/callback', methods=['POST'])
-def callback():
-    data = request.json
-    slot_id = data.get('orderID')
-    status = data.get('status')
-    if status == 1:
+# === CALLBACK (RESULT URL) ===
+@app.route('/api/freedompay/result', methods=['POST'])
+def freedompay_result():
+    data = request.form.to_dict()
+    
+    # Проверка подписи
+    script_name = 'result'
+    received_sig = data.get('pg_sig')
+    params_for_sig = {k: v for k, v in data.items() if k != 'pg_sig'}
+    calculated_sig = make_pg_sig(script_name, params_for_sig, SECRET_KEY)
+    
+    if received_sig != calculated_sig:
+        return "Invalid signature", 400
+    
+    if data.get('pg_status') == 'paid':
+        slot_id = data.get('pg_order_id')
         conn = sqlite3.connect('data.db')
         c = conn.cursor()
         c.execute('UPDATE slots SET status = "paid" WHERE id = ?', (slot_id,))
         conn.commit()
         conn.close()
+        print(f"✅ Слот {slot_id} активирован")
+    
+    return "ok"
+
+@app.route('/api/freedompay/success', methods=['GET'])
+def freedompay_success():
+    return redirect('https://denta-price.pro/cabinet?payment=success')
+
+@app.route('/api/freedompay/failure', methods=['GET'])
+def freedompay_failure():
+    return redirect('https://denta-price.pro/cabinet?payment=failed')
+
+# === СТАРЫЙ CALLBACK (ДЛЯ СОВМЕСТИМОСТИ, НЕ ИСПОЛЬЗУЕТСЯ) ===
+@app.route('/api/callback', methods=['POST'])
+def callback():
     return 'OK'
 
 # === СТАТУС НИШИ ===

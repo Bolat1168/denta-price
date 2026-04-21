@@ -1,122 +1,107 @@
-import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import { randomUUID } from 'crypto';
-
-const DATA_FILE_PATH = path.join(process.cwd(), 'data-src', 'promo_payments.json');
-
-interface PaymentRequest {
-  dentistId: string;
-  serviceId: string;
-  segment: string;
-  radius: number | 'city';
-  amount: number;
-}
-
-interface PaymentRecord {
-  id: string;
-  dentistId: string;
-  serviceId: string;
-  segment: string;
-  radius: number | 'city';
-  amount: number;
-  status: 'PENDING' | 'PAID';
-  createdAt: string;
-  paidAt: string | null;
-  paymentUrl: string;
-  paymentId: string;
-}
-
-async function readPayments(): Promise<PaymentRecord[]> {
-  try {
-    const data = await fs.readFile(DATA_FILE_PATH, 'utf-8');
-    let existingData = JSON.parse(data);
-    if (!Array.isArray(existingData)) existingData = [];
-    return existingData;
-  } catch (error) {
-    return [];
-  }
-}
-
-async function writePayments(payments: PaymentRecord[]): Promise<void> {
-  await fs.writeFile(DATA_FILE_PATH, JSON.stringify(payments, null, 2), 'utf-8');
-}
+﻿import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/firebaseAdmin';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: PaymentRequest = await request.json();
-    
-    // Валидация обязательных полей
-    if (
-      !body ||
-      typeof body.dentistId !== 'string' || body.dentistId.trim() === '' ||
-      typeof body.serviceId !== 'string' || body.serviceId.trim() === '' ||
-      typeof body.segment !== 'string' || body.segment.trim() === '' ||
-      (typeof body.radius !== 'number' && body.radius !== 'city') ||
-      typeof body.amount !== 'number' || Number.isNaN(body.amount)
-    ) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    const body = await request.json();
+    const { dentistId, serviceId, segment, radius, amount, targetSlotId } = body;
+
+    // Случай 1: Создание нового слота
+    if (!targetSlotId) {
+      const today = new Date().toISOString().split('T')[0];
+      const isPaid = amount > 0;
+
+      // Бесплатный слот — проверка лимита 3 в день
+      if (!isPaid) {
+        const freeSlots = await db.collection('slots')
+          .where('dentistId', '==', dentistId)
+          .where('date', '==', today)
+          .where('isPaid', '==', false)
+          .get();
+        
+        if (freeSlots.size >= 3) {
+          return NextResponse.json({
+            success: false,
+            error: 'Вы можете создать только 3 бесплатных слота в день. Остальные — платные.'
+          }, { status: 400 });
+        }
+      }
+
+      const slotData = {
+        date: today,
+        time: new Date().toLocaleTimeString(),
+        dentistId,
+        serviceId,
+        city: 'Almaty',
+        isPaid,
+        status: 'free',
+        price: amount,
+        segment,
+        radiusKm: radius,
+        createdAt: new Date().toISOString(),
+      };
+      const ref = await db.collection('slots').add(slotData);
+      return NextResponse.json({ success: true, slotId: ref.id, type: isPaid ? 'paid' : 'free' });
     }
 
-    // Валидация радиуса
-    const validRadii = ['city', 1, 3, 6];
-    if (!validRadii.includes(body.radius)) {
-      return NextResponse.json(
-        { error: 'Invalid radius value. Must be city, 1, 3 or 6' },
-        { status: 400 }
-      );
+    // Случай 2: Занятие или вытеснение существующего слота
+    const targetSlot = await db.collection('slots').doc(targetSlotId).get();
+    
+    if (!targetSlot.exists) {
+      return NextResponse.json({ success: false, error: 'Слот не найден' }, { status: 404 });
     }
 
-    // Валидация сегмента
-    const validSegments = ['econom', 'comfort', 'optimum', 'premium', 'luxury'];
-    if (!validSegments.includes(body.segment)) {
-      return NextResponse.json(
-        { error: 'Invalid segment value' },
-        { status: 400 }
-      );
+    const slot = targetSlot.data();
+    
+    if (!slot) {
+      return NextResponse.json({ success: false, error: 'Данные слота отсутствуют' }, { status: 404 });
     }
 
-    // Чтение существующих платежей
-    const payments = await readPayments();
-    
-    // Генерация ID платежа
-    const paymentId = `pay_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
-    
-    // Создание новой записи о платеже
-    const newPayment: PaymentRecord = {
-      id: randomUUID(),
-      dentistId: body.dentistId,
-      serviceId: body.serviceId,
-      segment: body.segment,
-      radius: body.radius,
-      amount: body.amount,
-      status: 'PENDING',
-      createdAt: new Date().toISOString(),
-      paidAt: null,
-      paymentUrl: '',
-      paymentId: paymentId,
+    const isOccupied = slot.status === 'occupied';
+    const isTargetPaid = slot.isPaid === true;
+    const isOccupierPaying = amount > 0;
+
+    // Вытеснение занятого слота — всегда платно
+    if (isOccupied && !isOccupierPaying) {
+      return NextResponse.json({
+        success: false,
+        error: 'Этот слот уже занят. Вытеснение возможно только платно.'
+      }, { status: 400 });
+    }
+
+    // Если слот свободен, но платный — нужна оплата
+    if (!isOccupied && isTargetPaid && !isOccupierPaying) {
+      return NextResponse.json({
+        success: false,
+        error: 'Этот слот платный. Оплатите, чтобы занять.'
+      }, { status: 400 });
+    }
+
+    // Занимаем (или вытесняем) слот
+    const updateData: any = {
+      status: 'occupied',
+      occupiedBy: dentistId,
+      occupiedAt: new Date().toISOString(),
     };
+    
+    if (isOccupierPaying) {
+      updateData.paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    }
+    
+    if (isOccupied && slot.occupiedBy) {
+      updateData.previousOwner = slot.occupiedBy;
+    }
 
-    // Добавление в массив и сохранение
-    payments.push(newPayment);
-    await writePayments(payments);
+    await targetSlot.ref.update(updateData);
 
     return NextResponse.json({
       success: true,
-      paymentId: newPayment.paymentId,
-      paymentRecordId: newPayment.id,
-      paymentUrl: newPayment.paymentUrl,
-      message: 'Payment initiated successfully'
+      action: isOccupied ? 'overwritten' : 'occupied',
+      slotId: targetSlotId,
+      paid: isOccupierPaying,
     });
-
   } catch (error) {
-    console.error('Payment processing error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Payment error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
