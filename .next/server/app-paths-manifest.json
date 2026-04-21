@@ -1,9 +1,0 @@
-{
-  "/register/page": "app/register/page.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js",
-  "/api/prices/almaty/route": "app/api/prices/almaty/route.js",
-  "/api/stats/get-dentist-stats/route": "app/api/stats/get-dentist-stats/route.js",
-  "/api/prices/promotion/route": "app/api/prices/promotion/route.js",
-  "/api/dentists/[dentistid]/route": "app/api/dentists/[dentistid]/route.js",
-  "/dentist-cabinet/page": "app/dentist-cabinet/page.js"
-}
