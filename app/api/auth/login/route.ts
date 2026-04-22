@@ -1,9 +1,6 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import fs from 'fs/promises';
-import path from 'path';
-
-const DENTISTS_FILE = path.join(process.cwd(), 'data-src', 'dentists.json');
+import { db } from '../../../../lib/firebaseAdmin';
 
 export async function POST(req: Request) {
   try {
@@ -16,12 +13,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await fs.readFile(DENTISTS_FILE, 'utf-8');
-    const dentists = JSON.parse(data);
+    let dentist = null;
+    let snapshot = null;
 
-    const dentist = dentists.find((d: any) => 
-      (email && d.email === email) || (phone && d.phone === phone)
-    );
+    if (email) {
+      snapshot = await db.collection('dentists').where('email', '==', email).limit(1).get();
+      if (!snapshot.empty) dentist = snapshot.docs[0].data();
+    }
+
+    if (!dentist && phone) {
+      snapshot = await db.collection('dentists').where('phone', '==', phone).limit(1).get();
+      if (!snapshot.empty) dentist = snapshot.docs[0].data();
+    }
 
     if (!dentist || !dentist.passwordHash) {
       return NextResponse.json(
@@ -38,9 +41,19 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ dentistId: dentist.id });
+    const response = NextResponse.json({ success: true, dentistId: dentist.id || dentist.dentistId });
+
+    response.cookies.set('dentistId', dentist.id || dentist.dentistId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30
+    });
+
+    return response;
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     return NextResponse.json({ error: 'Внутренняя ошибка' }, { status: 500 });
   }
 }

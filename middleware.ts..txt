@@ -1,0 +1,28 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  if (pathname.startsWith('/dentist-cabinet')) {
+    const dentistId = request.cookies.get('dentistId')?.value;
+    
+    if (!dentistId) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    
+    if (!request.nextUrl.searchParams.has('dentistId')) {
+      const newUrl = new URL(request.url);
+      newUrl.searchParams.set('dentistId', dentistId);
+      return NextResponse.redirect(newUrl);
+    }
+  }
+  
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/dentist-cabinet/:path*',
+};
