@@ -2,12 +2,27 @@
 import type { NextRequest } from 'next/server';
 
 // Список публичных маршрутов, не требующих авторизации
-const publicRoutes = ['/login', '/register', '/api/auth/login', '/api/auth/register', '/'];
+const publicRoutes = [
+  '/login', 
+  '/register', 
+  '/',
+  '/api/auth/login', 
+  '/api/auth/register',
+  '/api/auth/google',
+  '/api/auth/google/callback',
+  '/api/dentists/public',
+  '/api/slots/public',
+  '/api/prices',
+  '/api/prices/almaty',
+  '/api/prices/promotion',
+  '/api/hello',
+  '/api/ping'
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // роверяем, является ли маршрут публичным
+  // Проверяем, является ли маршрут публичным
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
   
   if (!isPublicRoute) {
@@ -19,7 +34,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     
-    // обавляем dentistId в URL для API и кабинета
+    // Добавляем dentistId в URL для API и кабинета
     if (!request.nextUrl.searchParams.has('dentistId')) {
       const newUrl = new URL(request.url);
       newUrl.searchParams.set('dentistId', dentistId);

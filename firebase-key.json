@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "perceptive-ivy-435106-h6",
+  "private_key_id": "a18ee1835dfe14f123f4b4d74924aafcf1f1de22",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCrmn2fp+CbFP+Z\n83l1bxGtyEjQOYnYQhaZwEwWU+Qe+LzzoXUX4PLp/9a/HdUV6vgz30ZhUCptTzYl\nMKlzyd8i5LzcMPkXqoEyyACCHw2U2xSEEZRNJKlKgk3KFcK4QzB0ArBDSDYNSaBY\nIo2gkWCwaM7R5Po8kOsirOLAGvY3AHirs/xKiIlCUJoA6O9GL9MgPIAlb6U18WeS\n7Gy1THKj14cyE0HNxDJj4tVE5oQ60MBIKDnC3Ye0t4Q/iQONtDW5ZWmoxsr3XnHc\nnOj8SQaPgl1CeePr+046B9GVFUimSjo6QBxCieeLy5kN+gL6ecESE3osrrMY6bWB\n60aQphBvAgMBAAECggEAGeERG/BJ36lxiKqewRaQgHhJftmGj84bsXE+KEnbh840\nVLufOIwsphx2qtjZZ1ZJuyzrZMadt2FwRXiKvZMOqyj60Gw0TJzioiFmbjk3p6DI\nfchW6LFkNH/lMlpIxNghKQW0xljQCf32CASh/jqebcxIkH/rOxIR2+ddxOHsCsww\nmfmqi8DaUD3gJtfqfBsxnkagNPPlN5y0hl4XNCVgdOZzhkK2l5BHQj8KFHY638UA\nLGb9LM0dI/MhVjC4UBrf14TjmtOaVC38saMBMgCLh7dn4PvgC/f0NAAVOikYXrBV\nx/XlCUcdVnQqh0lj5wak0yNa/Odpq6ZX4nCcM9yjUQKBgQDcd6VD0eAze+DWggaf\nG1z8YUlQ07UpzxfCq/190mxsvOXuKa3tt4kdRpxUq7BYGW7sjWD3viN7p9l2W6T8\nidhpuTLG5P+MBtf7tEATsLEZ/zksE1QhThbXYnlvnSq9l2U1/6QKRojYMUdSWF8q\nO+R5h14bCodQFHEII/Balr5S0QKBgQDHQr/z6v2TdS2JHtALPfx7qcTY2B33Xgur\neq/Y+uw7qsAdS2xj+GvVjQICeEhO0Be8kCB8yDMm+TbCpnaXp66tad74TLp8Nz3m\nq/OMAY9c2pmGIb/tOqz9vVLAPpf+VuwMtECwXoEuFZDt/0I0uUj2u+d5rQ35qROi\nMjTSS5p/PwKBgQC9Hxmy+ufj4kF2YaYCeLukeGQnJOUEj3UndtiGRarjAIwRaMmd\n4VKKvZa/f2RPvsmLvJ/RBdd0bQE76dO3Gxx9XPQ08B5TZU+DyRUqjujtjyXhLFeA\nFne7nerkFyOh7axRzRFQCz+6jVNMTSidlzEgG0Jb2gVHabGotQOrAiMT8QKBgCx+\nYTJsJJdKsRJPSRFZlAlhDU2GZJqZ620tBhsjXKCuLhvcfaWNETcsN2ipxyuiF8rJ\nPBfg9FsdhvbMCOswTDb4zwsOxw15oF7jwoxexM5tGZ7z5lFoqrw2DEZVM8ddTXRA\nw7keQSYzNpuORhBT11ERAE0RMW+wK2wqXdUfgK4tAoGAU6ydYtFWCfgzYoVXx6CL\nNc03ZpEHaIvX8SaQqg34qEJcEFsaHLB6htJXlipUZEyxo4yVGd//N2lCbHdmlNYS\nfxot9QAOVza7pHSxh0CaV74tI9NDEyxzR2UsAup+KS3urvWVaULd4Z7cAvsLJ5GQ\nJVKcaNNkQXW0nYBAvpOO/bY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@perceptive-ivy-435106-h6.iam.gserviceaccount.com",
+  "client_id": "101479434841481227003",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40perceptive-ivy-435106-h6.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
