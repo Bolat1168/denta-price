@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Добавляем эту строку, чтобы Vercel не кэшировал ошибку 405
+export const dynamic = 'force-dynamic';
+
 const GOOGLE_CLIENT_ID = '301770227648-3p2e20d8hugio2aot7af6r21l60690e3.apps.googleusercontent.com';
 const REDIRECT_URI = 'https://denta-price.pro/api/auth/google/callback';
 
@@ -8,11 +11,9 @@ function getAuthUrl() {
 }
 
 export async function GET() {
-  // Просто перекидывает браузер в Google
   return NextResponse.redirect(getAuthUrl());
 }
 
 export async function POST() {
-  // Отдает фронтенду ссылку текстом, чтобы не было ошибки 405
   return NextResponse.json({ url: getAuthUrl() });
 }
