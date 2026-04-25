@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 function LoginContent() {
@@ -18,7 +17,6 @@ function LoginContent() {
     onSuccess: async (codeResponse) => {
       setLoading(true);
       try {
-        // Изменен путь на /google-new для обхода заблокированного кэша Vercel
         const res = await fetch('/api/auth/google-new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -123,12 +121,6 @@ function LoginContent() {
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm">
-          Нет аккаунта?{' '}
-          <Link href="/register" className="text-blue-600 hover:underline">
-            Зарегистрироваться
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -1,19 +1,35 @@
 import { NextResponse } from 'next/server';
+import { OAuth2Client } from 'google-auth-library';
 
-// Добавляем эту строку, чтобы Vercel не кэшировал ошибку 405
-export const dynamic = 'force-dynamic';
+const client = new OAuth2Client(
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  'postmessage'
+);
 
-const GOOGLE_CLIENT_ID = '301770227648-3p2e20d8hugio2aot7af6r21l60690e3.apps.googleusercontent.com';
-const REDIRECT_URI = 'https://denta-price.pro/api/auth/google/callback';
+export async function POST(request: Request) {
+  try {
+    const { code } = await request.json();
+    
+    // Обмен кода на токены
+    const { tokens } = await client.getToken(code);
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token!,
+      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return NextResponse.json({ error: 'Ошибка Google Auth' }, { status: 400 });
+    }
 
-function getAuthUrl() {
-  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=online`;
-}
+    // Здесь должна быть твоя логика поиска стоматолога в БД по email
+    // Пример (замени на свой вызов к БД/Firebase):
+    const dentistId = "ID_ИЗ_ТВОЕЙ_БАЗЫ"; 
 
-export async function GET() {
-  return NextResponse.redirect(getAuthUrl());
-}
-
-export async function POST() {
-  return NextResponse.json({ url: getAuthUrl() });
+    return NextResponse.json({ dentistId });
+  } catch (error) {
+    console.error('Auth error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 }
