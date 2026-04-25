@@ -17,7 +17,7 @@ function LoginContent() {
     onSuccess: async (codeResponse) => {
       setLoading(true);
       try {
-        const res = await fetch('/api/auth/google-v2-new', {
+        const res = await fetch('/api/auth/google-v2-v2-new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: codeResponse.code }),
