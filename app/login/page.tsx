@@ -66,7 +66,7 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center">Вход</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center text-black">Вход</h1>
 
         <button
           onClick={() => googleLogin()}
@@ -87,38 +87,38 @@ function LoginContent() {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">или</span>
+            <span className="px-2 bg-white text-gray-500 font-bold uppercase">или</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-bold mb-1 text-black uppercase">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-black rounded px-3 py-2 text-black"
               required
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">Пароль</label>
+            <label className="block text-sm font-bold mb-1 text-black uppercase">Пароль</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border border-black rounded px-3 py-2 text-black"
               required
             />
           </div>
-          {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>}
+          {error && <div className="mb-4 text-xs font-black text-red-600 bg-red-50 p-2 border border-red-600 uppercase">{error}</div>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-black text-white py-2 rounded font-black uppercase hover:bg-gray-900 disabled:opacity-50"
           >
-            {loading ? 'Вход...' : 'Войти'}
+            {loading ? 'Загрузка...' : 'Войти'}
           </button>
         </form>
       </div>
@@ -128,9 +128,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  if (!clientId) {
-    return <div className="p-4 text-red-600">Ошибка: нет NEXT_PUBLIC_GOOGLE_CLIENT_ID</div>;
-  }
+  if (!clientId) return null;
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <LoginContent />
