@@ -20,8 +20,8 @@ function RegisterContent() {
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       try {
-        // Добавлена метка времени ?v=${Date.now()} для обхода кэша Vercel
-        const res = await fetch(`/api/auth/google?v=${Date.now()}`, {
+        // Изменен путь на google-new для обхода кэша Vercel
+        const res = await fetch('/api/auth/google-new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessToken: tokenResponse.access_token }),

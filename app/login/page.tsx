@@ -18,8 +18,8 @@ function LoginContent() {
     onSuccess: async (codeResponse) => {
       setLoading(true);
       try {
-        // Добавлен v=${Date.now()} для обхода кэша Vercel
-        const res = await fetch(`/api/auth/google?v=${Date.now()}`, {
+        // Изменен путь на /google-new для обхода заблокированного кэша Vercel
+        const res = await fetch('/api/auth/google-new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: codeResponse.code }),
