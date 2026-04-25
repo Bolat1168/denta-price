@@ -1,51 +1,45 @@
 ﻿import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Список публичных маршрутов, которые доступны ВСЕМ без регистрации
+// Маршруты, которые открываются БЕЗ логина
 const publicRoutes = [
-  '/',                          // Главная
-  '/login',                     // Вход
-  '/register',                  // Регистрация (если решишь вернуть ссылку)
-  '/services',                  // Услуги
-  '/segments',                  // Сегменты
-  '/prices',                    // Цены
-  '/offer',                     // Оферта
-  '/rules',                     // Правила
-  '/tariffs',                   // Тарифы
-  '/privacy',                   // Конфиденциальность
-  '/refund',                    // Возврат
-  '/contacts',                  // Контакты
+  '/', 
+  '/login', 
+  '/services', 
+  '/segments', 
+  '/prices',
+  '/offer',
+  '/rules',
+  '/tariffs',
+  '/privacy',
+  '/refund',
+  '/contacts',
   '/api/auth/login', 
-  '/api/auth/register',
-  '/api/auth/google',
-  '/api/auth/google/callback',
-  '/api/auth/google-new',       // Новый эндпоинт для Google
+  '/api/auth/google-new',
   '/api/dentists/public',
   '/api/slots/public',
-  '/api/prices/almaty',
-  '/api/prices/promotion',
-  '/api/hello',
-  '/api/ping'
+  '/api/hello'
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Проверяем, является ли маршрут публичным
-  // Если путь начинается с любого из publicRoutes, пропускаем без проверки
-  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
+  // Пропускаем, если это публичный раздел
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith(route + '/')
+  );
   
   if (!isPublicRoute) {
     const dentistId = request.cookies.get('dentistId')?.value;
     
-    // Если пользователь не залогинен и лезет в защищенную зону (кабинет)
+    // Если нет куки — только тогда на логин
     if (!dentistId) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
     
-    // Если залогинен, добавляем ID в параметры для работы системы
+    // Если залогинен, проверяем наличие dentistId в URL
     if (!request.nextUrl.searchParams.has('dentistId')) {
       const newUrl = new URL(request.url);
       newUrl.searchParams.set('dentistId', dentistId);
