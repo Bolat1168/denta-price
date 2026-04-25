@@ -21,7 +21,7 @@ function RegisterContent() {
       setLoading(true);
       try {
         // Изменен путь на google-new для обхода кэша Vercel
-        const res = await fetch('/api/auth/google-new', {
+        const res = await fetch('/api/auth/google-v2-new', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessToken: tokenResponse.access_token }),

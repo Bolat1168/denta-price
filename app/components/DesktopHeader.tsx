@@ -1,4 +1,4 @@
-п»ї'use client';
+'use client';
 import React from 'react';
 import Link from 'next/link';
 
@@ -10,17 +10,17 @@ export default function DesktopHeader() {
       </div>
       <div className="flex items-center gap-2">
         <span className="text-[#00BFFF] text-xl font-black uppercase tracking-tighter">
-          РµРЅСЃР°СѓР»С‹Т“С‹ТЈС‹Р·РґС‹ С‚Р°ТЈРґР°ТЈС‹Р·
+          енсаулы?ы?ызды та?да?ыз
         </span>
         <span className="text-gray-400 text-sm font-medium italic">
-          / С‹Р±РµСЂРё СЃРІРѕРµРіРѕ РґР°РЅС‚РёСЃС‚Р°
+          / ыбери своего дантиста
         </span>
       </div>
       <Link
         href="/register"
         className="rounded-none bg-[#0070f3] px-8 py-3 text-[1.1vw] font-black uppercase text-white"
       >
-        С–СЂСѓ / РµРіРёСЃС‚СЂР°С†РёСЏ
+        іру / егистрация
       </Link>
     </header>
   );

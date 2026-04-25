@@ -1,4 +1,4 @@
-п»ї"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -564,7 +564,7 @@ export default function DentistCabinetDesktopCompositionPage() {
           // ignore
         }
       }
-      // Р“Р°СЂР°РЅС‚РёСЂСѓРµРј РјРёРЅРёРјСѓРј С‚СЂРё СЃС‚СЂРѕРєРё (Р±РµР· РїРѕС‚РµСЂРё СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёС…)
+      // Гарантируем минимум три строки (без потери существующих)
       setServiceRows(prev => {
         if (prev.length >= 3) return prev;
         const newRows = [...prev];
@@ -789,7 +789,7 @@ export default function DentistCabinetDesktopCompositionPage() {
 
   const handleAddTempRow = () => {
     if (!tempServiceId) {
-      alert('Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ');
+      alert('Выберите услугу');
       return;
     }
     const newRow = createEmptyServiceRow();
@@ -882,7 +882,7 @@ export default function DentistCabinetDesktopCompositionPage() {
     }
     updatePriceAbortControllerRef.current = new AbortController();
 
-    // РњРіРЅРѕРІРµРЅРЅРѕРµ РІС‹РїРѕР»РЅРµРЅРёРµ Р±РµР· setTimeout
+    // Мгновенное выполнение без setTimeout
     const updatedRow = serviceRows.find(r => r.id === rowId);
     if (!updatedRow || updatedRow.price === null || !updatedRow.serviceId) return;
 
@@ -1253,7 +1253,7 @@ const handleSaveProfile = async () => {
     });
   }, [profileFullName, profilePhotoUrl, profileWhatsapp, profileAddress]);
 
-  // Р”РѕР±Р°РІР»РµРЅРЅС‹Р№ СЌС„С„РµРєС‚ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРµРіРјРµРЅС‚РѕРІ РїСЂРё Р·Р°РіСЂСѓР·РєРµ С†РµРЅ
+  // Добавленный эффект для обновления сегментов при загрузке цен
   useEffect(() => {
     if (almatyPrices.length === 0 || !isMounted) return;
 
@@ -1274,7 +1274,7 @@ const handleSaveProfile = async () => {
     }
   }, [almatyPrices, serviceRows, isMounted]);
 
-  // Р—Р°РіСЂСѓР·РєР° СЃС‚Р°С‚РёСЃС‚РёРєРё РїСЂРѕСЃРјРѕС‚СЂРѕРІ РёР· API
+  // Загрузка статистики просмотров из API
   useEffect(() => {
     const loadStats = async () => {
       const dentistId = getDentistId();
@@ -1310,7 +1310,7 @@ const handleSaveProfile = async () => {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Р¤Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№. РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ 10MB.');
+      alert('Файл слишком большой. Максимальный размер 10MB.');
       return;
     }
 
@@ -1327,7 +1327,7 @@ const handleSaveProfile = async () => {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё');
+        throw new Error(error.message || 'Ошибка загрузки');
       }
 
       const data = await response.json();
@@ -1345,7 +1345,7 @@ const handleSaveProfile = async () => {
       if (onSuccess) onSuccess(data.url);
     } catch (error) {
       console.error('Upload error:', error);
-      alert('РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р». РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.');
+      alert('Не удалось загрузить файл. Попробуйте снова.');
     } finally {
       event.target.value = '';
     }
@@ -1386,12 +1386,12 @@ const handleSaveProfile = async () => {
       <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
         <header className="flex-none bg-white border-b px-6 py-4 flex justify-between items-center">
           <div className="flex items-baseline">
-            <span className="text-2xl font-bold text-slate-800">РЎС‚РѕРјР°С‚РѕР»РѕРі РєР°Р±РёРЅРµС‚С–</span>
-            <span className="text-lg italic font-light text-slate-500 ml-2">/ РљР°Р±РёРЅРµС‚ РґР°РЅС‚РёСЃС‚Р°</span>
+            <span className="text-2xl font-bold text-slate-800">Стоматолог кабинеті</span>
+            <span className="text-lg italic font-light text-slate-500 ml-2">/ Кабинет дантиста</span>
           </div>
           <button type="button" style={unifiedButtonStyle} onClick={handleLogout}>
-            <span className="text-sm">РЁС‹Т“Сѓ</span>
-            <span className="text-xs ml-1">Р’С‹Р№С‚Рё</span>
+            <span className="text-sm">Шы?у</span>
+            <span className="text-xs ml-1">Выйти</span>
           </button>
         </header>
 
@@ -1423,8 +1423,8 @@ const handleSaveProfile = async () => {
               }}>
                 <div style={{ minWidth: 0 }}>
                   <h2 className="font-bold text-gray-900 text-xl mb-2">
-                    <span className="font-bold">РњРµРЅС–ТЈ Т›С‹Р·РјРµС‚С‚РµСЂС–Рј</span>
-                    <span className="text-sm italic font-light text-gray-600 ml-1"> / РњРѕРё СѓСЃР»СѓРіРё</span>
+                    <span className="font-bold">Мені? ?ызметтерім</span>
+                    <span className="text-sm italic font-light text-gray-600 ml-1"> / Мои услуги</span>
                   </h2>
                 </div>
 
@@ -1465,27 +1465,27 @@ const handleSaveProfile = async () => {
                         <tr className="border-b border-gray-200 bg-gray-50">
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
                             <div style={{ fontSize: '13px', lineHeight: '1.2' }}>
-                              <span className="font-bold">ТљС‹Р·РјРµС‚</span>
-                              <span className="text-xs italic font-light text-gray-600 ml-1"> / РЈСЃР»СѓРіРё</span>
+                              <span className="font-bold">?ызмет</span>
+                              <span className="text-xs italic font-light text-gray-600 ml-1"> / Услуги</span>
                             </div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-right font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Р‘Р°Т“Р°СЃС‹</div>
-                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Р¦Р•РќРђ в‚ё</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Ба?асы</div>
+                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>ЦЕНА ?</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>РЎРµРіРјРµРЅС‚</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Сегмент</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>РљУ©С‚РµСЂСѓ / РџРѕРґРЅСЏС‚СЊ</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>К?теру / Поднять</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>РљУ©СЂС–РЅСѓ</div>
-                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Р’РёРґРёРјРѕСЃС‚СЊ</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>К?ріну</div>
+                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Видимость</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-right font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>РўУ©Р»РµСѓ</div>
-                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>РћРїР»Р°С‚Р°</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Т?леу</div>
+                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Оплата</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px', width: '40px' }} className="text-center font-medium text-gray-700">
                             <div style={{ fontSize: '13px', lineHeight: '1.2' }}></div>
@@ -1542,7 +1542,7 @@ const handleSaveProfile = async () => {
                                       onClick={(e) => e.stopPropagation()}
                                       onChange={(e) => updateServiceRow(row.id, e.target.value)}
                                     >
-                                      <option value="">Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ</option>
+                                      <option value="">Выберите услугу</option>
                                       {Object.entries(groupedServices).map(([category, services]) => (
                                         <optgroup key={category} label={category}>
                                           {services.map((service) => (
@@ -1587,7 +1587,7 @@ const handleSaveProfile = async () => {
                                         fontWeight: '500',
                                         backgroundColor: '#ffffff'
                                       }}
-                                      placeholder="Р’РІРµРґРёС‚Рµ СЃС‚РѕРёРјРѕСЃС‚СЊ"
+                                      placeholder="Введите стоимость"
                                       disabled={false}
                                     />
                                   </div>
@@ -1640,21 +1640,21 @@ const handleSaveProfile = async () => {
                                         }
                                       }}
                                     >
-                                      <option value="city">Р“РѕСЂРѕРґ (city)</option>
-                                      <option value="1">1 РєРј</option>
-                                      <option value="3">3 РєРј</option>
-                                      <option value="6">6 РєРј</option>
+                                      <option value="city">Город (city)</option>
+                                      <option value="1">1 км</option>
+                                      <option value="3">3 км</option>
+                                      <option value="6">6 км</option>
                                     </select>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%', justifyContent: 'space-between' }}>
                                       <div style={{ fontSize: '12px', fontWeight: '500', color: '#111827' }}>
                                         {priceLoadingMap.get(row.id) ? '...' : (() => {
                                           const dynamic = nicheStatuses[row.id];
                                           if (dynamic) {
-                                            return dynamic.price.toLocaleString('ru-RU') + ' в‚ё';
+                                            return dynamic.price.toLocaleString('ru-RU') + ' ?';
                                           }
                                           const multiplier = promotionPrices[segment]?.[String(row.radiusKm)];
                                           if (multiplier && row.price) {
-                                            return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' в‚ё';
+                                            return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ?';
                                           }
                                           return '';
                                         })()}
@@ -1671,8 +1671,8 @@ const handleSaveProfile = async () => {
                                               '#ef4444',
                                           }}
                                           title={
-                                            nicheStatuses[row.id].status === 'green' ? 'СЃРІРѕР±РѕРґРЅРѕ' :
-                                            nicheStatuses[row.id].status === 'yellow' ? 'РІС‹С‚РµСЃРЅРµРЅРёРµ' : 'Р°РєС‚РёРІРЅРѕ'
+                                            nicheStatuses[row.id].status === 'green' ? 'свободно' :
+                                            nicheStatuses[row.id].status === 'yellow' ? 'вытеснение' : 'активно'
                                           }
                                         />
                                       )}
@@ -1745,9 +1745,9 @@ const handleSaveProfile = async () => {
                                       alignItems: 'center',
                                       justifyContent: 'center'
                                     }}
-                                    title="РЈРґР°Р»РёС‚СЊ СѓСЃР»СѓРіСѓ"
+                                    title="Удалить услугу"
                                   >
-                                    Г—
+                                    ?
                                   </button>
                                 </td>
                               </tr>
@@ -1819,8 +1819,8 @@ const handleSaveProfile = async () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '12px', minWidth: 0, overflowX: 'hidden' }}>
                         <h3 className="font-medium text-gray-900 text-sm">
-                          <span className="font-bold">ТљС‹Р·РјРµС‚ Р°РЅР°Р»РёС‚РёРєР°СЃС‹</span>
-                          <span className="text-xs italic font-light text-gray-600 ml-1"> / РђРЅР°Р»РёС‚РёРєР° РїРѕ СѓСЃР»СѓРіРµ</span>
+                          <span className="font-bold">?ызмет аналитикасы</span>
+                          <span className="text-xs italic font-light text-gray-600 ml-1"> / Аналитика по услуге</span>
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '6px', justifyContent: 'flex-end', minWidth: 0, flex: '1 1 auto', flexShrink: 1, whiteSpace: 'nowrap', maxWidth: '100%', overflowX: 'hidden' }}>
                           {segmentConfig.map((cfg: any) => {
@@ -1834,11 +1834,11 @@ const handleSaveProfile = async () => {
                             const segColor = SEGMENT_COLORS[cfg.key as keyof typeof SEGMENT_COLORS];
                             const getPriceText = () => {
                               if (!almatyPriceForRanges) return '';
-                              if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) return `РґРѕ ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} в‚ё`;
-                              if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) return `РґРѕ ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} в‚ё`;
-                              if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) return `РґРѕ ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} в‚ё`;
-                              if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) return `РґРѕ ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} в‚ё`;
-                              if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) return `РѕС‚ ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} в‚ё`;
+                              if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) return `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) return `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) return `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) return `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) return `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ?`;
                               return '';
                             };
                             const priceText = getPriceText();
@@ -1904,9 +1904,9 @@ const handleSaveProfile = async () => {
                         <div className="flex items-center gap-2 p-1 border border-gray-200 rounded">
                           <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: nicheStatuses[analyticsRow.id].status === 'green' ? '#22c55e' : nicheStatuses[analyticsRow.id].status === 'yellow' ? '#eab308' : '#ef4444' }} />
                           <span className="text-xs font-medium">
-                            {nicheStatuses[analyticsRow.id].status === 'green' ? 'СЃРІРѕР±РѕРґРЅРѕ' : nicheStatuses[analyticsRow.id].status === 'yellow' ? 'РІС‹С‚РµСЃРЅРµРЅРёРµ' : 'Р°РєС‚РёРІРЅРѕ'}
+                            {nicheStatuses[analyticsRow.id].status === 'green' ? 'свободно' : nicheStatuses[analyticsRow.id].status === 'yellow' ? 'вытеснение' : 'активно'}
                           </span>
-                          <span className="text-sm font-bold ml-1">{nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} в‚ё</span>
+                          <span className="text-sm font-bold ml-1">{nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ?</span>
                         </div>
                       )}
                     </div>
@@ -1915,13 +1915,13 @@ const handleSaveProfile = async () => {
                       <table className="w-full border-collapse" style={{ minWidth: 0 }}>
                         <thead>
                           <tr className="border-b border-gray-200">
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>РЎРїСЂРѕСЃ<br />РЅР° СѓСЃР»СѓРіСѓ</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>Р’СЃРµРіРѕ<br />РїСЂРѕСЃРјРѕС‚СЂС‹ (РіРѕСЂРѕРґ)</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>Р’Р°С€<br />СЃРµРіРјРµРЅС‚</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>1 РєРј</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>3 РєРј</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>6 РєРј</th>
-                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>WhatsApp<br />РїРµСЂРµС…РѕРґС‹</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>Спрос<br />на услугу</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>Всего<br />просмотры (город)</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>Ваш<br />сегмент</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>1 км</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>3 км</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>6 км</th>
+                            <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>WhatsApp<br />переходы</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1943,10 +1943,10 @@ const handleSaveProfile = async () => {
                     <div style={{ height: '1px', backgroundColor: '#3b82f6', width: '100%', marginTop: '8px', marginBottom: '8px' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                       <h3 className="font-medium text-gray-900 text-sm">
-                        <span className="font-bold">РњУ™СЂС‚РµР±Рµ</span>
-                        <span className="text-xs italic font-light text-gray-600 ml-1"> / РЎС‚Р°С‚СѓСЃ</span>
+                        <span className="font-bold">М?ртебе</span>
+                        <span className="text-xs italic font-light text-gray-600 ml-1"> / Статус</span>
                       </h3>
-                      <button className={`${buttonBase} border-gray-300 bg-white hover:bg-gray-50`}>Р•СЃРµРїС‚РµСЂ / РћС‚С‡С‘С‚С‹</button>
+                      <button className={`${buttonBase} border-gray-300 bg-white hover:bg-gray-50`}>Есептер / Отчёты</button>
                     </div>
                     <div>
                       {(() => {
@@ -1959,7 +1959,7 @@ const handleSaveProfile = async () => {
                                 <div key={row.id} style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#f9fafb' }}>
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
                                     <div style={{ fontSize: '14px', fontWeight: '500', color: '#111827', textAlign: 'left', lineHeight: '1.4' }}>
-                                      Р’Р°С€Сѓ СѓСЃР»СѓРіСѓ <strong>"{getServiceDisplayName(row.id)}"</strong> РІРёРґСЏС‚ РІ СЂР°РґРёСѓСЃРµ <strong>{row.radiusKm} РєРј</strong> РІ СЃРµРіРјРµРЅС‚Рµ <strong>{row.segment}</strong>.
+                                      Вашу услугу <strong>"{getServiceDisplayName(row.id)}"</strong> видят в радиусе <strong>{row.radiusKm} км</strong> в сегменте <strong>{row.segment}</strong>.
                                     </div>
                                   </div>
                                 </div>
@@ -1976,20 +1976,20 @@ const handleSaveProfile = async () => {
               {/* Right column - Profile */}
               <div className="w-[480px]" style={{ width: 480, justifySelf: "end", overflowY: 'visible', overflowX: 'hidden', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>
                 <h2 className="font-bold text-gray-900 text-xl mb-2">
-                  <span className="font-bold">РњРµРЅС–ТЈ РїСЂРѕС„РёР»С–Рј</span>
-                  <span className="text-sm italic font-light text-gray-600 ml-1"> / РњРѕР№ РїСЂРѕС„РёР»СЊ</span>
+                  <span className="font-bold">Мені? профилім</span>
+                  <span className="text-sm italic font-light text-gray-600 ml-1"> / Мой профиль</span>
                 </h2>
 
                 <div className="bg-white rounded-xl border border-gray-200 p-3">
                   <div className="mb-2">
-                    <div className="text-xs font-medium text-gray-700 mb-1">Р¤РРћ</div>
-                    <input type="text" value={profileFullName} onChange={(e) => setProfileFullName(e.target.value)} className="w-full h-7 rounded-md border px-2 text-xs leading-5" placeholder="Р’РІРµРґРёС‚Рµ Р¤РРћ" />
+                    <div className="text-xs font-medium text-gray-700 mb-1">ФИО</div>
+                    <input type="text" value={profileFullName} onChange={(e) => setProfileFullName(e.target.value)} className="w-full h-7 rounded-md border px-2 text-xs leading-5" placeholder="Введите ФИО" />
                     <div className="flex justify-start mt-1">
                       <button style={unifiedButtonStyle} onClick={handleSaveProfile}>Save</button>
                     </div>
                   </div>
                   <div className="mb-2">
-                    <div className="text-xs font-medium text-gray-700 mb-1">Р¤РѕС‚Рѕ</div>
+                    <div className="text-xs font-medium text-gray-700 mb-1">Фото</div>
                     <div className="flex items-center gap-3">
                       <div style={{ width: 64, height: 64, flex: '0 0 64px' }}>
                         <img src={profilePhotoUrl} alt="Doctor" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
@@ -2020,20 +2020,20 @@ const handleSaveProfile = async () => {
                     </div>
                   </div>
                   <div className="mb-2">
-                    <div className="text-xs font-medium text-gray-700 mb-1">РђРґСЂРµСЃ</div>
-                    <input type="text" value={profileAddress} onChange={(e) => setProfileAddress(e.target.value)} className="w-full h-7 rounded-md border px-2 text-xs leading-5" placeholder="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ РѕРєР°Р·Р°РЅРёСЏ СѓСЃР»СѓРі" />
+                    <div className="text-xs font-medium text-gray-700 mb-1">Адрес</div>
+                    <input type="text" value={profileAddress} onChange={(e) => setProfileAddress(e.target.value)} className="w-full h-7 rounded-md border px-2 text-xs leading-5" placeholder="Введите адрес оказания услуг" />
                     <div className="flex justify-start mt-1">
                       <button style={unifiedButtonStyle} onClick={handleSaveProfile}>Save</button>
                     </div>
                   </div>
                   <div className="mt-3">
                     <h3 className="font-medium text-gray-900 text-xs mb-2">
-                      <span className="font-bold">ТљТ°Р–РђРўРўРђР </span>
-                      <span className="text-[10px] italic font-light text-gray-600 ml-1"> / Р”РћРљРЈРњР•РќРўР«</span>
+                      <span className="font-bold">??ЖАТТАР</span>
+                      <span className="text-[10px] italic font-light text-gray-600 ml-1"> / ДОКУМЕНТЫ</span>
                     </h3>
                     <div className="space-y-2">
                       <div>
-                        <div className="text-xs text-gray-700 mb-1">РЎРµСЂС‚РёС„РёРєР°С‚</div>
+                        <div className="text-xs text-gray-700 mb-1">Сертификат</div>
                         <div className="flex gap-2">
                           <input 
                             type="file" 
@@ -2053,7 +2053,7 @@ const handleSaveProfile = async () => {
                         {certificate && <div className="text-xs text-green-600 mt-1">{certificate.name}</div>}
                       </div>
                       <div>
-                        <div className="text-xs text-gray-700 mb-1">РљР°С‚РµРіРѕСЂРёСЏ</div>
+                        <div className="text-xs text-gray-700 mb-1">Категория</div>
                         <div className="flex gap-2">
                           <input 
                             type="file" 
@@ -2101,7 +2101,7 @@ const handleSaveProfile = async () => {
                   }}
                   onClick={() => setActiveTab('services')}
                 >
-                  РЈСЃР»СѓРіРё
+                  Услуги
                 </button>
                 <button
                   style={{
@@ -2115,7 +2115,7 @@ const handleSaveProfile = async () => {
                   }}
                   onClick={() => setActiveTab('profile')}
                 >
-                  РџСЂРѕС„РёР»СЊ
+                  Профиль
                 </button>
                 <button
                   style={{
@@ -2129,24 +2129,24 @@ const handleSaveProfile = async () => {
                   }}
                   onClick={() => setActiveTab('reports')}
                 >
-                  РћС‚С‡С‘С‚С‹
+                  Отчёты
                 </button>
               </div>
 
               <div style={{ flex: 1, overflowY: 'auto', padding: '0 12px' }}>
                 {activeTab === 'services' && (
                   <div>
-                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>РњРѕРё СѓСЃР»СѓРіРё</h2>
+                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>Мои услуги</h2>
 
                     <div className="mb-4 border border-gray-200 rounded-lg p-3 bg-white">
                       <div className="mb-2">
-                        <div className="text-xs font-medium text-gray-700 mb-1">РЈСЃР»СѓРіР°</div>
+                        <div className="text-xs font-medium text-gray-700 mb-1">Услуга</div>
                         <select
                           value={tempServiceId}
                           onChange={(e) => setTempServiceId(e.target.value)}
                           className="w-full border rounded px-2 py-2 text-sm"
                         >
-                          <option value="">Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ</option>
+                          <option value="">Выберите услугу</option>
                           {Object.entries(groupedServices).map(([category, services]) => (
                             <optgroup key={category} label={category}>
                               {services.map((service) => (
@@ -2161,7 +2161,7 @@ const handleSaveProfile = async () => {
 
                       <div className="flex gap-2 mb-2">
                         <div className="flex-1">
-                          <div className="text-xs font-medium text-gray-700 mb-1">Р¦РµРЅР° (в‚ё)</div>
+                          <div className="text-xs font-medium text-gray-700 mb-1">Цена (?)</div>
                           <input
                             type="text"
                             value={tempPrice ?? ''}
@@ -2174,7 +2174,7 @@ const handleSaveProfile = async () => {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="text-xs font-medium text-gray-700 mb-1">Р Р°РґРёСѓСЃ</div>
+                          <div className="text-xs font-medium text-gray-700 mb-1">Радиус</div>
                           <select
                             value={tempRadius}
                             onChange={(e) => {
@@ -2187,17 +2187,17 @@ const handleSaveProfile = async () => {
                             }}
                             className="w-full border rounded px-2 py-2 text-sm"
                           >
-                            <option value="city">Р“РѕСЂРѕРґ (city)</option>
-                            <option value="1">1 РєРј</option>
-                            <option value="3">3 РєРј</option>
-                            <option value="6">6 РєРј</option>
+                            <option value="city">Город (city)</option>
+                            <option value="1">1 км</option>
+                            <option value="3">3 км</option>
+                            <option value="6">6 км</option>
                           </select>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs font-medium text-gray-700 mb-1">РЎРµРіРјРµРЅС‚</div>
+                          <div className="text-xs font-medium text-gray-700 mb-1">Сегмент</div>
                           <div
                             className="px-3 py-1 rounded text-xs font-medium inline-block"
                             style={{
@@ -2205,22 +2205,22 @@ const handleSaveProfile = async () => {
                               color: (tempServiceId && tempPrice !== null) ? getSegmentColor(getSegment(tempPrice, tempServiceId)).text : '#9ca3af'
                             }}
                           >
-                            {(tempServiceId && tempPrice !== null) ? getSegment(tempPrice, tempServiceId) : 'вЂ”'}
+                            {(tempServiceId && tempPrice !== null) ? getSegment(tempPrice, tempServiceId) : '—'}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs font-medium text-gray-700 mb-1">РЎС‚РѕРёРјРѕСЃС‚СЊ</div>
+                          <div className="text-xs font-medium text-gray-700 mb-1">Стоимость</div>
                           <span className="text-sm font-bold">
                             {tempServiceId && tempPrice !== null && tempRadius
                               ? (() => {
                                   const segment = getSegment(tempPrice, tempServiceId);
                                   const multiplier = promotionPrices[segment]?.[String(tempRadius)];
                                   if (multiplier) {
-                                    return Math.round(tempPrice * multiplier).toLocaleString('ru-RU') + ' в‚ё';
+                                    return Math.round(tempPrice * multiplier).toLocaleString('ru-RU') + ' ?';
                                   }
-                                  return '0 в‚ё';
+                                  return '0 ?';
                                 })()
-                              : '0 в‚ё'}
+                              : '0 ?'}
                           </span>
                         </div>
                         <button
@@ -2277,12 +2277,12 @@ const handleSaveProfile = async () => {
                                 justifyContent: 'center'
                               }}
                             >
-                              Г—
+                              ?
                             </button>
 
                             <div style={{ marginBottom: '12px', paddingRight: '30px' }}>
                               <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px' }}>
-                                {getServiceNameRU(row.serviceId) || 'Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ'}
+                                {getServiceNameRU(row.serviceId) || 'Выберите услугу'}
                               </div>
                               <select
                                 style={{
@@ -2298,7 +2298,7 @@ const handleSaveProfile = async () => {
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => updateServiceRow(row.id, e.target.value)}
                               >
-                                <option value="">Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ</option>
+                                <option value="">Выберите услугу</option>
                                 {Object.entries(groupedServices).map(([category, services]) => (
                                   <optgroup key={category} label={category}>
                                     {services.map((service) => (
@@ -2312,7 +2312,7 @@ const handleSaveProfile = async () => {
                             </div>
 
                             <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Р¦РµРЅР° (в‚ё)</div>
+                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Цена (?)</div>
                               <input
                                 type="text"
                                 value={localPrice}
@@ -2345,7 +2345,7 @@ const handleSaveProfile = async () => {
                             </div>
 
                             <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>РЎРµРіРјРµРЅС‚</div>
+                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Сегмент</div>
                               <div
                                 style={{
                                   width: '100%',
@@ -2359,12 +2359,12 @@ const handleSaveProfile = async () => {
                                   color: segmentColor.text
                                 }}
                               >
-                                {segment || 'вЂ”'}
+                                {segment || '—'}
                               </div>
                             </div>
 
                             <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Р Р°РґРёСѓСЃ</div>
+                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Радиус</div>
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 {['city', 1, 3, 6].map((km) => (
                                   <button
@@ -2381,7 +2381,7 @@ const handleSaveProfile = async () => {
                                       cursor: 'pointer'
                                     }}
                                   >
-                                    {km === 'city' ? 'Р“РѕСЂРѕРґ' : `${km} РєРј`}
+                                    {km === 'city' ? 'Город' : `${km} км`}
                                   </button>
                                 ))}
                               </div>
@@ -2392,16 +2392,16 @@ const handleSaveProfile = async () => {
                                 {priceLoadingMap.get(row.id) ? '...' : (() => {
                                   const dynamic = nicheStatuses[row.id];
                                   if (dynamic) {
-                                    return dynamic.price.toLocaleString('ru-RU') + ' в‚ё';
+                                    return dynamic.price.toLocaleString('ru-RU') + ' ?';
                                   }
                                   const multiplier = promotionPrices[segment]?.[String(row.radiusKm)];
                                   if (multiplier && row.price) {
-                                    return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' в‚ё';
+                                    return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ?';
                                   }
                                   return '0';
                                 })()}
                               </span>
-                              <span style={{ fontSize: '13px', color: '#6b7280', marginLeft: '4px' }}>Р·Р° РїСЂРѕРґРІРёР¶РµРЅРёРµ</span>
+                              <span style={{ fontSize: '13px', color: '#6b7280', marginLeft: '4px' }}>за продвижение</span>
                             </div>
 
                             {nicheStatuses[row.id] && (
@@ -2418,8 +2418,8 @@ const handleSaveProfile = async () => {
                                   }}
                                 />
                                 <span style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>
-                                  {nicheStatuses[row.id].status === 'green' ? 'РЎРІРѕР±РѕРґРЅРѕ' :
-                                   nicheStatuses[row.id].status === 'yellow' ? 'Р’С‹С‚РµСЃРЅРµРЅРёРµ' : 'РђРєС‚РёРІРЅРѕ'}
+                                  {nicheStatuses[row.id].status === 'green' ? 'Свободно' :
+                                   nicheStatuses[row.id].status === 'yellow' ? 'Вытеснение' : 'Активно'}
                                 </span>
                               </div>
                             )}
@@ -2445,13 +2445,13 @@ const handleSaveProfile = async () => {
                                   cursor: 'pointer'
                                 }}
                               >
-                                {row.isPaid ? 'Р’С‹С‚РµСЃРЅРёС‚СЊ' : 'РћРїР»Р°С‚РёС‚СЊ РїСЂРѕРґРІРёР¶РµРЅРёРµ'}
+                                {row.isPaid ? 'Вытеснить' : 'Оплатить продвижение'}
                               </button>
                             )}
 
                             {row.isPaid && row.paidAt && (
                               <div style={{ fontSize: '12px', color: '#059669', textAlign: 'center', marginTop: '8px' }}>
-                                РћРїР»Р°С‡РµРЅРѕ: {new Date(row.paidAt).toLocaleDateString()}
+                                Оплачено: {new Date(row.paidAt).toLocaleDateString()}
                               </div>
                             )}
                           </div>
@@ -2478,7 +2478,7 @@ const handleSaveProfile = async () => {
                       }}
                     >
                       <span style={{ fontSize: '24px', fontWeight: '400' }}>+</span>
-                      <span>Р”РѕР±Р°РІРёС‚СЊ СѓСЃР»СѓРіСѓ</span>
+                      <span>Добавить услугу</span>
                     </button>
 
                     {/* Sticky analytics block with resizer */}
@@ -2522,7 +2522,7 @@ const handleSaveProfile = async () => {
                       
                       <div style={{ height: `${mobileAnalyticsHeight}px`, overflowY: 'auto', padding: '16px' }}>
                         <div style={{ marginBottom: '20px' }}>
-                          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>РђРЅР°Р»РёС‚РёРєР°</h3>
+                          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>Аналитика</h3>
 
                           <div style={{ marginBottom: '20px' }}>
                             <select
@@ -2531,7 +2531,7 @@ const handleSaveProfile = async () => {
                                 const selectedId = e.target.value;
                                 setAnalyticsRowId(selectedId);
                                 setActiveService(selectedId);
-                                // РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ nicheStatuses РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕР№ СѓСЃР»СѓРіРё
+                                // Принудительное обновление nicheStatuses для выбранной услуги
                                 const selectedRow = serviceRows.find(r => r.id === selectedId);
                                 if (selectedRow && selectedRow.serviceId && selectedRow.price !== null && selectedRow.segment && selectedRow.radiusKm) {
                                   setPriceLoading(selectedId, true);
@@ -2556,7 +2556,7 @@ const handleSaveProfile = async () => {
                                 backgroundColor: '#ffffff'
                               }}
                             >
-                              <option value="">Р’С‹Р±РµСЂРёС‚Рµ СѓСЃР»СѓРіСѓ</option>
+                              <option value="">Выберите услугу</option>
                               {serviceRows.map((row) => (
                                 <option key={row.id} value={row.id}>
                                   {getServiceDisplayName(row.id)}
@@ -2586,19 +2586,19 @@ const handleSaveProfile = async () => {
                                   let priceText = '';
                                   if (almatyPriceForRanges) {
                                     if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) {
-                                      priceText = `РґРѕ ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} в‚ё`;
+                                      priceText = `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) {
-                                      priceText = `РґРѕ ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} в‚ё`;
+                                      priceText = `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) {
-                                      priceText = `РґРѕ ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} в‚ё`;
+                                      priceText = `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) {
-                                      priceText = `РґРѕ ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} в‚ё`;
+                                      priceText = `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) {
-                                      priceText = `РѕС‚ ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} в‚ё`;
+                                      priceText = `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ?`;
                                     }
                                   }
 
@@ -2657,11 +2657,11 @@ const handleSaveProfile = async () => {
                                 }}
                               />
                               <span style={{ fontSize: '13px', fontWeight: '500' }}>
-                                {nicheStatuses[analyticsRow.id].status === 'green' ? 'РЎРІРѕР±РѕРґРЅРѕ' :
-                                 nicheStatuses[analyticsRow.id].status === 'yellow' ? 'Р’С‹С‚РµСЃРЅРµРЅРёРµ' : 'РђРєС‚РёРІРЅРѕ'}
+                                {nicheStatuses[analyticsRow.id].status === 'green' ? 'Свободно' :
+                                 nicheStatuses[analyticsRow.id].status === 'yellow' ? 'Вытеснение' : 'Активно'}
                               </span>
                               <span style={{ fontSize: '15px', fontWeight: 'bold', marginLeft: 'auto' }}>
-                                {nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} в‚ё
+                                {nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ?
                               </span>
                             </div>
                           )}
@@ -2682,9 +2682,9 @@ const handleSaveProfile = async () => {
                                 color: '#6b7280',
                                 textAlign: 'center'
                               }}>
-                                <div>1 РєРј</div>
-                                <div>3 РєРј</div>
-                                <div>6 РєРј</div>
+                                <div>1 км</div>
+                                <div>3 км</div>
+                                <div>6 км</div>
                                 <div>City</div>
                               </div>
 
@@ -2713,7 +2713,7 @@ const handleSaveProfile = async () => {
                             justifyContent: 'space-between',
                             alignItems: 'center'
                           }}>
-                            <span style={{ fontSize: '14px', color: '#374151' }}>WhatsApp РїРµСЂРµС…РѕРґС‹</span>
+                            <span style={{ fontSize: '14px', color: '#374151' }}>WhatsApp переходы</span>
                             <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb' }}>
                               {analyticsRow?.whatsappClicks?.toLocaleString('ru-RU') ?? '0'}
                             </span>
@@ -2726,10 +2726,10 @@ const handleSaveProfile = async () => {
 
                 {activeTab === 'profile' && (
                   <div>
-                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>РњРѕР№ РїСЂРѕС„РёР»СЊ</h2>
+                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>Мой профиль</h2>
                     <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#ffffff' }}>
                       <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Р¤РРћ</div>
+                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>ФИО</div>
                         <input
                           type="text"
                           value={profileFullName}
@@ -2743,7 +2743,7 @@ const handleSaveProfile = async () => {
                             fontSize: '14px',
                             boxSizing: 'border-box'
                           }}
-                          placeholder="Р’РІРµРґРёС‚Рµ Р¤РРћ"
+                          placeholder="Введите ФИО"
                         />
                         <div style={{ marginTop: '8px' }}>
                           <button style={unifiedButtonStyle} onClick={handleSaveProfile}>Save</button>
@@ -2751,7 +2751,7 @@ const handleSaveProfile = async () => {
                       </div>
 
                       <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Р¤РѕС‚Рѕ</div>
+                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Фото</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <img
                             src={profilePhotoUrl}
@@ -2797,7 +2797,7 @@ const handleSaveProfile = async () => {
                       </div>
 
                       <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>РђРґСЂРµСЃ</div>
+                        <div style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '4px' }}>Адрес</div>
                         <input
                           type="text"
                           value={profileAddress}
@@ -2811,7 +2811,7 @@ const handleSaveProfile = async () => {
                             fontSize: '14px',
                             boxSizing: 'border-box'
                           }}
-                          placeholder="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ РѕРєР°Р·Р°РЅРёСЏ СѓСЃР»СѓРі"
+                          placeholder="Введите адрес оказания услуг"
                         />
                         <div style={{ marginTop: '8px' }}>
                           <button style={unifiedButtonStyle} onClick={handleSaveProfile}>Save</button>
@@ -2819,10 +2819,10 @@ const handleSaveProfile = async () => {
                       </div>
 
                       <div>
-                        <h3 style={{ fontSize: '13px', fontWeight: '500', marginBottom: '8px' }}>ТљТ°Р–РђРўРўРђР  / Р”РћРљРЈРњР•РќРўР«</h3>
+                        <h3 style={{ fontSize: '13px', fontWeight: '500', marginBottom: '8px' }}>??ЖАТТАР / ДОКУМЕНТЫ</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           <div>
-                            <div style={{ fontSize: '12px', color: '#374151', marginBottom: '4px' }}>РЎРµСЂС‚РёС„РёРєР°С‚</div>
+                            <div style={{ fontSize: '12px', color: '#374151', marginBottom: '4px' }}>Сертификат</div>
                             <div style={{ display: 'flex', gap: '8px' }}>
                               <input 
                                 type="file" 
@@ -2839,7 +2839,7 @@ const handleSaveProfile = async () => {
                             {certificate && <div style={{ fontSize: '11px', color: '#059669', marginTop: '2px' }}>{certificate.name}</div>}
                           </div>
                           <div>
-                            <div style={{ fontSize: '12px', color: '#374151', marginBottom: '4px' }}>РљР°С‚РµРіРѕСЂРёСЏ</div>
+                            <div style={{ fontSize: '12px', color: '#374151', marginBottom: '4px' }}>Категория</div>
                             <div style={{ display: 'flex', gap: '8px' }}>
                               <input 
                                 type="file" 
@@ -2863,8 +2863,8 @@ const handleSaveProfile = async () => {
 
                 {activeTab === 'reports' && (
                   <div>
-                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>РћС‚С‡С‘С‚С‹</h2>
-                    <p style={{ color: '#6b7280', fontSize: '14px' }}>РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ</p>
+                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px' }}>Отчёты</h2>
+                    <p style={{ color: '#6b7280', fontSize: '14px' }}>Нет данных для отображения</p>
                   </div>
                 )}
               </div>
