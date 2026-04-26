@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
       updatedAt: data?.updatedAt?.toDate?.()?.toISOString() || null,
     });
   } catch (error: any) {
-    console.error('GET error:', error);
     return NextResponse.json({ 
       error: 'Failed to fetch dentist', 
       details: error instanceof Error ? error.message : String(error) 
@@ -47,31 +46,21 @@ async function verifyAuth(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const authResult = await verifyAuth(request);
-    if (!authResult.authenticated) {
+    if (!authResult.authenticated || !authResult.uid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
     const body = await request.json();
     const { id, ...updateData } = body;
     
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    }
-    
-    if (authResult.uid !== id) {
+    if (!id || authResult.uid !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     
     const dentistRef = db.collection('dentists').doc(id);
-    const dentistDoc = await dentistRef.get();
-    
-    if (!dentistDoc.exists) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-    
+    const sanitizedUpdate: Record<string, any> = {};
     const allowedFields = ['fullName', 'specialization', 'experience', 'education', 'clinicName', 'clinicAddress', 'phone', 'price', 'about', 'workingHours', 'avatar', 'city'];
     
-    const sanitizedUpdate: any = {};
     for (const field of allowedFields) {
       if (updateData[field] !== undefined) {
         sanitizedUpdate[field] = updateData[field];
@@ -81,19 +70,8 @@ export async function PUT(request: NextRequest) {
     sanitizedUpdate['updatedAt'] = new Date();
     await dentistRef.update(sanitizedUpdate);
     
-    const updatedDoc = await dentistRef.get();
-    const updatedData = updatedDoc.data();
-    
-    return NextResponse.json({
-      success: true,
-      dentist: {
-        id: updatedDoc.id,
-        ...updatedData,
-        updatedAt: updatedData?.updatedAt?.toDate?.()?.toISOString() || null,
-      }
-    });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('PUT error:', error);
     return NextResponse.json({ 
       error: 'Failed to update', 
       details: error instanceof Error ? error.message : String(error) 
