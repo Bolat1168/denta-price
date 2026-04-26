@@ -1,8 +1,0 @@
-{
-  "routes": [
-    {
-      "src": "/api/auth/google",
-      "dest": "/api/api/auth/google/route.ts"
-    }
-  ]
-}
