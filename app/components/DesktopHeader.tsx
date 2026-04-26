@@ -10,17 +10,17 @@ export default function DesktopHeader() {
       </div>
       <div className="flex items-center gap-2">
         <span className="text-[#00BFFF] text-xl font-black uppercase tracking-tighter">
-          енсаулы?ы?ызды та?да?ыз
+          РµРЅСЃР°СѓР»С‹?С‹?С‹Р·РґС‹ С‚Р°?РґР°?С‹Р·
         </span>
         <span className="text-gray-400 text-sm font-medium italic">
-          / ыбери своего дантиста
+          / С‹Р±РµСЂРё СЃРІРѕРµРіРѕ РґР°РЅС‚РёСЃС‚Р°
         </span>
       </div>
       <Link
         href="/register"
         className="rounded-none bg-[#0070f3] px-8 py-3 text-[1.1vw] font-black uppercase text-white"
       >
-        іру / егистрация
+        С–СЂСѓ / РµРіРёСЃС‚СЂР°С†РёСЏ
       </Link>
     </header>
   );
