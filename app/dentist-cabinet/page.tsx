@@ -418,7 +418,7 @@ export default function DentistCabinetDesktopCompositionPage() {
           }));
         }
       })
-      .catch(err => {
+      .catch((err: any) => {
         if (err instanceof Error && err.name !== 'AbortError') console.error('Failed to fetch niche status:', err);
       })
       .finally(() => setPriceLoading(analyticsRowId, false));
@@ -444,7 +444,7 @@ export default function DentistCabinetDesktopCompositionPage() {
             const data = await res.json();
             setNicheStatuses(prev => ({ ...prev, [row.id]: data }));
           }
-        } catch (e) {
+        } catch (e: any) {
           if (e instanceof Error && e.name !== 'AbortError') console.error("Niche Fetch Error", e);
         } finally {
           setPriceLoading(row.id, false);
@@ -552,7 +552,7 @@ export default function DentistCabinetDesktopCompositionPage() {
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Fetch error", e);
       }
 
@@ -608,7 +608,7 @@ export default function DentistCabinetDesktopCompositionPage() {
             console.error('Failed to save dentist data on server');
           }
         })
-        .catch(err => console.error('Failed to save dentist data:', err));
+        .catch((err: any) => console.error('Failed to save dentist data:', err));
     }, 500);
 
     return () => {
@@ -912,7 +912,7 @@ export default function DentistCabinetDesktopCompositionPage() {
           setNicheStatuses(prev => ({ ...prev, [rowId]: data }));
         }
       })
-      .catch(err => {
+      .catch((err: any) => {
         if (err instanceof Error && err.name !== 'AbortError') console.error(err);
       })
       .finally(() => setPriceLoading(rowId, false));
@@ -954,7 +954,7 @@ export default function DentistCabinetDesktopCompositionPage() {
               setNicheStatuses(prev => ({ ...prev, [rowId]: data }));
             }
           })
-          .catch(err => {
+          .catch((err: any) => {
             if (err instanceof Error && err.name !== 'AbortError') console.error(err);
           })
           .finally(() => setPriceLoading(rowId, false));
@@ -1061,11 +1061,11 @@ export default function DentistCabinetDesktopCompositionPage() {
                   console.error('Failed to update public ads on server');
                 }
               })
-              .catch(err => console.error('Failed to update public ads:', err));
+              .catch((err: any) => console.error('Failed to update public ads:', err));
           }, 0);
         }
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('Payment request failed:', error);
         alert('Payment error');
       })
@@ -1144,7 +1144,7 @@ export default function DentistCabinetDesktopCompositionPage() {
               console.error('Failed to update public ads on server');
             }
           })
-          .catch(err => console.error('Failed to update public ads:', err));
+          .catch((err: any) => console.error('Failed to update public ads:', err));
       }
     }, 0);
   };
@@ -1293,7 +1293,7 @@ const handleSaveProfile = async () => {
             whatsappClicks: stats.byService[row.serviceId]?.whatsappClicks || 0
           })));
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error('Failed to load stats:', e);
       }
     };
