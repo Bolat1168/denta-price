@@ -1182,10 +1182,10 @@ const handleSaveProfile = async () => {
         } else {
             alert('Profile saved successfully');
         }
-    } catch (error) {
-        console.error('Save profile error:', error);
-        alert('Failed to save profile: ' + error.message);
-    }
+    } catch (error: any) {
+    console.error('Save profile error:', error);
+    alert('Failed to save profile: ' + (error?.message || String(error)));
+  }
 };
 
   const handleLogout = () => {
