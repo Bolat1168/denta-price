@@ -1,9 +1,10 @@
 {
+  "cleanUrls": true,
   "routes": [
     {
       "src": "/api/auth/google",
-      "methods": ["POST", "OPTIONS"],
-      "dest": "/api/auth/google"
+      "dest": "/api/auth/google/route",
+      "headers": { "Cache-Control": "no-store, max-age=0" }
     }
   ]
 }
