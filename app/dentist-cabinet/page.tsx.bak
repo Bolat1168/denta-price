@@ -1149,34 +1149,44 @@ export default function DentistCabinetDesktopCompositionPage() {
     }, 0);
   };
 
-  const handleSaveProfile = async () => {
+const handleSaveProfile = async () => {
     const dentistId = getDentistId();
-    if (!dentistId || dentistId === 'doctor-1') return;
+    if (!dentistId || dentistId === 'doctor-1') {
+        alert('dentistId not found');
+        return;
+    }
 
     try {
-      const response = await fetch(`/api/dentists/${dentistId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: profileFullName || '',
-          photoUrl: profilePhotoUrl || '',
-          whatsapp: profileWhatsapp || '',
-          address: profileAddress || '',
-          services: serviceRows || [],
-        }),
-      });
+        const payload = {
+            fullName: profileFullName || '',
+            photoUrl: profilePhotoUrl || '',
+            whatsapp: profileWhatsapp || '',
+            address: profileAddress || '',
+            services: serviceRows || [],
+        };
 
-      if (!response.ok) {
-        console.error('Failed to save profile');
-        alert('Не удалось сохранить профиль');
-      } else {
-        alert('Профиль сохранен');
-      }
-    } catch (error) {
-      console.error('Save profile error:', error);
-      alert('Ошибка сохранения');
-    }
-  };
+        console.log('Saving profile for:', dentistId, payload);
+
+        const response = await fetch(`/api/dentists/${dentistId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        const text = await response.text();
+        console.log('Response status:', response.status);
+        console.log('Response body:', text);
+
+        if (!response.ok) {
+            alert(`Error ${response.status}: ${text}`);
+        } else {
+            alert('Profile saved successfully');
+        }
+    } catch (error: any) {
+    console.error('Save profile error:', error);
+    alert('Failed to save profile: ' + (error?.message || String(error)));
+  }
+};
 
   const handleLogout = () => {
     const dentistId = getDentistId();
@@ -1380,7 +1390,7 @@ export default function DentistCabinetDesktopCompositionPage() {
             <span className="text-lg italic font-light text-slate-500 ml-2">/ Кабинет дантиста</span>
           </div>
           <button type="button" style={unifiedButtonStyle} onClick={handleLogout}>
-            <span className="text-sm">Шығу</span>
+            <span className="text-sm">Шы?у</span>
             <span className="text-xs ml-1">Выйти</span>
           </button>
         </header>
@@ -1413,7 +1423,7 @@ export default function DentistCabinetDesktopCompositionPage() {
               }}>
                 <div style={{ minWidth: 0 }}>
                   <h2 className="font-bold text-gray-900 text-xl mb-2">
-                    <span className="font-bold">Менің қызметтерім</span>
+                    <span className="font-bold">Мені? ?ызметтерім</span>
                     <span className="text-sm italic font-light text-gray-600 ml-1"> / Мои услуги</span>
                   </h2>
                 </div>
@@ -1455,26 +1465,26 @@ export default function DentistCabinetDesktopCompositionPage() {
                         <tr className="border-b border-gray-200 bg-gray-50">
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
                             <div style={{ fontSize: '13px', lineHeight: '1.2' }}>
-                              <span className="font-bold">Қызмет</span>
+                              <span className="font-bold">?ызмет</span>
                               <span className="text-xs italic font-light text-gray-600 ml-1"> / Услуги</span>
                             </div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-right font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Бағасы</div>
-                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>ЦЕНА ₸</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Ба?асы</div>
+                            <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>ЦЕНА ?</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
                             <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Сегмент</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Көтеру / Поднять</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>К?теру / Поднять</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-left font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Көріну</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>К?ріну</div>
                             <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Видимость</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px' }} className="text-right font-medium text-gray-700">
-                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Төлеу</div>
+                            <div style={{ fontSize: '13px', lineHeight: '1.2' }}>Т?леу</div>
                             <div style={{ fontSize: '11px', lineHeight: '1.2', fontWeight: 'normal', color: '#6b7280' }}>Оплата</div>
                           </th>
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px', width: '40px' }} className="text-center font-medium text-gray-700">
@@ -1640,11 +1650,11 @@ export default function DentistCabinetDesktopCompositionPage() {
                                         {priceLoadingMap.get(row.id) ? '...' : (() => {
                                           const dynamic = nicheStatuses[row.id];
                                           if (dynamic) {
-                                            return dynamic.price.toLocaleString('ru-RU') + ' ₸';
+                                            return dynamic.price.toLocaleString('ru-RU') + ' ?';
                                           }
                                           const multiplier = promotionPrices[segment]?.[String(row.radiusKm)];
                                           if (multiplier && row.price) {
-                                            return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ₸';
+                                            return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ?';
                                           }
                                           return '';
                                         })()}
@@ -1737,7 +1747,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                                     }}
                                     title="Удалить услугу"
                                   >
-                                    ×
+                                    ?
                                   </button>
                                 </td>
                               </tr>
@@ -1809,7 +1819,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '8px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '12px', minWidth: 0, overflowX: 'hidden' }}>
                         <h3 className="font-medium text-gray-900 text-sm">
-                          <span className="font-bold">Қызмет аналитикасы</span>
+                          <span className="font-bold">?ызмет аналитикасы</span>
                           <span className="text-xs italic font-light text-gray-600 ml-1"> / Аналитика по услуге</span>
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '6px', justifyContent: 'flex-end', minWidth: 0, flex: '1 1 auto', flexShrink: 1, whiteSpace: 'nowrap', maxWidth: '100%', overflowX: 'hidden' }}>
@@ -1824,11 +1834,11 @@ export default function DentistCabinetDesktopCompositionPage() {
                             const segColor = SEGMENT_COLORS[cfg.key as keyof typeof SEGMENT_COLORS];
                             const getPriceText = () => {
                               if (!almatyPriceForRanges) return '';
-                              if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) return `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ₸`;
-                              if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) return `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ₸`;
-                              if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) return `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ₸`;
-                              if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) return `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ₸`;
-                              if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) return `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ₸`;
+                              if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) return `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) return `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) return `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) return `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ?`;
+                              if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) return `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ?`;
                               return '';
                             };
                             const priceText = getPriceText();
@@ -1896,7 +1906,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                           <span className="text-xs font-medium">
                             {nicheStatuses[analyticsRow.id].status === 'green' ? 'свободно' : nicheStatuses[analyticsRow.id].status === 'yellow' ? 'вытеснение' : 'активно'}
                           </span>
-                          <span className="text-sm font-bold ml-1">{nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ₸</span>
+                          <span className="text-sm font-bold ml-1">{nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ?</span>
                         </div>
                       )}
                     </div>
@@ -1933,7 +1943,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                     <div style={{ height: '1px', backgroundColor: '#3b82f6', width: '100%', marginTop: '8px', marginBottom: '8px' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                       <h3 className="font-medium text-gray-900 text-sm">
-                        <span className="font-bold">Мәртебе</span>
+                        <span className="font-bold">М?ртебе</span>
                         <span className="text-xs italic font-light text-gray-600 ml-1"> / Статус</span>
                       </h3>
                       <button className={`${buttonBase} border-gray-300 bg-white hover:bg-gray-50`}>Есептер / Отчёты</button>
@@ -1966,7 +1976,7 @@ export default function DentistCabinetDesktopCompositionPage() {
               {/* Right column - Profile */}
               <div className="w-[480px]" style={{ width: 480, justifySelf: "end", overflowY: 'visible', overflowX: 'hidden', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>
                 <h2 className="font-bold text-gray-900 text-xl mb-2">
-                  <span className="font-bold">Менің профилім</span>
+                  <span className="font-bold">Мені? профилім</span>
                   <span className="text-sm italic font-light text-gray-600 ml-1"> / Мой профиль</span>
                 </h2>
 
@@ -2018,7 +2028,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                   </div>
                   <div className="mt-3">
                     <h3 className="font-medium text-gray-900 text-xs mb-2">
-                      <span className="font-bold">ҚҰЖАТТАР</span>
+                      <span className="font-bold">??ЖАТТАР</span>
                       <span className="text-[10px] italic font-light text-gray-600 ml-1"> / ДОКУМЕНТЫ</span>
                     </h3>
                     <div className="space-y-2">
@@ -2151,7 +2161,7 @@ export default function DentistCabinetDesktopCompositionPage() {
 
                       <div className="flex gap-2 mb-2">
                         <div className="flex-1">
-                          <div className="text-xs font-medium text-gray-700 mb-1">Цена (₸)</div>
+                          <div className="text-xs font-medium text-gray-700 mb-1">Цена (?)</div>
                           <input
                             type="text"
                             value={tempPrice ?? ''}
@@ -2206,11 +2216,11 @@ export default function DentistCabinetDesktopCompositionPage() {
                                   const segment = getSegment(tempPrice, tempServiceId);
                                   const multiplier = promotionPrices[segment]?.[String(tempRadius)];
                                   if (multiplier) {
-                                    return Math.round(tempPrice * multiplier).toLocaleString('ru-RU') + ' ₸';
+                                    return Math.round(tempPrice * multiplier).toLocaleString('ru-RU') + ' ?';
                                   }
-                                  return '0 ₸';
+                                  return '0 ?';
                                 })()
-                              : '0 ₸'}
+                              : '0 ?'}
                           </span>
                         </div>
                         <button
@@ -2267,7 +2277,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                                 justifyContent: 'center'
                               }}
                             >
-                              ×
+                              ?
                             </button>
 
                             <div style={{ marginBottom: '12px', paddingRight: '30px' }}>
@@ -2302,7 +2312,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                             </div>
 
                             <div style={{ marginBottom: '12px' }}>
-                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Цена (₸)</div>
+                              <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Цена (?)</div>
                               <input
                                 type="text"
                                 value={localPrice}
@@ -2382,11 +2392,11 @@ export default function DentistCabinetDesktopCompositionPage() {
                                 {priceLoadingMap.get(row.id) ? '...' : (() => {
                                   const dynamic = nicheStatuses[row.id];
                                   if (dynamic) {
-                                    return dynamic.price.toLocaleString('ru-RU') + ' ₸';
+                                    return dynamic.price.toLocaleString('ru-RU') + ' ?';
                                   }
                                   const multiplier = promotionPrices[segment]?.[String(row.radiusKm)];
                                   if (multiplier && row.price) {
-                                    return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ₸';
+                                    return Math.round(row.price * multiplier).toLocaleString('ru-RU') + ' ?';
                                   }
                                   return '0';
                                 })()}
@@ -2576,19 +2586,19 @@ export default function DentistCabinetDesktopCompositionPage() {
                                   let priceText = '';
                                   if (almatyPriceForRanges) {
                                     if (cfg.key === 'econom' && Number.isFinite(almatyPriceForRanges.econom)) {
-                                      priceText = `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ₸`;
+                                      priceText = `до ${Number(almatyPriceForRanges.econom).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'comfort' && Number.isFinite(almatyPriceForRanges.comfort)) {
-                                      priceText = `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ₸`;
+                                      priceText = `до ${Number(almatyPriceForRanges.comfort).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'optimum' && Number.isFinite(almatyPriceForRanges.optimum)) {
-                                      priceText = `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ₸`;
+                                      priceText = `до ${Number(almatyPriceForRanges.optimum).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'premium' && Number.isFinite(almatyPriceForRanges.premium)) {
-                                      priceText = `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ₸`;
+                                      priceText = `до ${Number(almatyPriceForRanges.premium).toLocaleString('ru-RU')} ?`;
                                     }
                                     if (cfg.key === 'luxury' && Number.isFinite(almatyPriceForRanges.luxury)) {
-                                      priceText = `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ₸`;
+                                      priceText = `от ${Number(almatyPriceForRanges.luxury).toLocaleString('ru-RU')} ?`;
                                     }
                                   }
 
@@ -2651,7 +2661,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                                  nicheStatuses[analyticsRow.id].status === 'yellow' ? 'Вытеснение' : 'Активно'}
                               </span>
                               <span style={{ fontSize: '15px', fontWeight: 'bold', marginLeft: 'auto' }}>
-                                {nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ₸
+                                {nicheStatuses[analyticsRow.id].price.toLocaleString('ru-RU')} ?
                               </span>
                             </div>
                           )}
@@ -2809,7 +2819,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                       </div>
 
                       <div>
-                        <h3 style={{ fontSize: '13px', fontWeight: '500', marginBottom: '8px' }}>ҚҰЖАТТАР / ДОКУМЕНТЫ</h3>
+                        <h3 style={{ fontSize: '13px', fontWeight: '500', marginBottom: '8px' }}>??ЖАТТАР / ДОКУМЕНТЫ</h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           <div>
                             <div style={{ fontSize: '12px', color: '#374151', marginBottom: '4px' }}>Сертификат</div>
