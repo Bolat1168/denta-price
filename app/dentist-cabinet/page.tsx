@@ -69,7 +69,7 @@ const loadServiceRowsFromStorage = (): ServiceRow[] => {
         };
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to load service rows from storage:', error);
   }
 
@@ -81,7 +81,7 @@ const saveServiceRowsToStorage = (rows: ServiceRow[]) => {
 
   try {
     localStorage.setItem(nsKey(STORAGE_KEY_BASE), JSON.stringify(rows));
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save service rows to storage:', error);
   }
 };
@@ -128,7 +128,7 @@ const saveProfileSnapshotToStorage = (snap: DentistProfileSnapshot) => {
     if (snap.photoUrl) localStorage.setItem(nsKey(PROFILE_KEYS.photoUrl), String(snap.photoUrl));
     if (snap.whatsapp) localStorage.setItem(nsKey(PROFILE_KEYS.whatsapp), String(snap.whatsapp));
     if (snap.address) localStorage.setItem(nsKey(PROFILE_KEYS.address), String(snap.address));
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save profile snapshot to storage:', error);
   }
 };
@@ -153,7 +153,7 @@ const savePublicAdsSnapshotToStorage = (snap: PublicAdsSnapshot) => {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(nsKey(PUBLIC_ADS_SNAPSHOT_KEY_BASE), JSON.stringify(snap));
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to save public ads snapshot:', error);
   }
 };
@@ -178,7 +178,7 @@ const loadDocumentFromStorage = (key: string): DocumentData | null => {
     if (stored) {
       return JSON.parse(stored);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Failed to load document ${key} from storage:`, error);
   }
 
@@ -194,7 +194,7 @@ const saveDocumentToStorage = (key: string, data: DocumentData | null) => {
     } else {
       localStorage.removeItem(key);
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Failed to save document ${key} to storage:`, error);
   }
 };
@@ -1343,7 +1343,7 @@ const handleSaveProfile = async () => {
       }
 
       if (onSuccess) onSuccess(data.url);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
       alert('Не удалось загрузить файл. Попробуйте снова.');
     } finally {
