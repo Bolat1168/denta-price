@@ -24,9 +24,12 @@ export async function GET(request: NextRequest) {
       createdAt: data?.createdAt?.toDate?.()?.toISOString() || null,
       updatedAt: data?.updatedAt?.toDate?.()?.toISOString() || null,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('GET error:', error);
-    return NextResponse.json({ error: 'Failed to fetch dentist', details: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to fetch dentist', 
+      details: error instanceof Error ? error.message : String(error) 
+    }, { status: 500 });
   }
 }
 
@@ -68,7 +71,7 @@ export async function PUT(request: NextRequest) {
     
     const allowedFields = ['fullName', 'specialization', 'experience', 'education', 'clinicName', 'clinicAddress', 'phone', 'price', 'about', 'workingHours', 'avatar', 'city'];
     
-    const sanitizedUpdate = {};
+    const sanitizedUpdate: any = {};
     for (const field of allowedFields) {
       if (updateData[field] !== undefined) {
         sanitizedUpdate[field] = updateData[field];
@@ -89,8 +92,11 @@ export async function PUT(request: NextRequest) {
         updatedAt: updatedData?.updatedAt?.toDate?.()?.toISOString() || null,
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('PUT error:', error);
-    return NextResponse.json({ error: 'Failed to update', details: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to update', 
+      details: error instanceof Error ? error.message : String(error) 
+    }, { status: 500 });
   }
 }
