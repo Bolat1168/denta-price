@@ -1,31 +1,13 @@
-import { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
+﻿import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (credentials?.email === "admin" && credentials?.password === "admin") {
-          return { id: "1", name: "Admin", email: "admin@denta.price", role: "admin" };
-        }
-        return null;
-      }
-    })
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
-  session: { strategy: 'jwt' },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) (token as any).role = (user as any).role;
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) (session.user as any).role = (token as any).role;
-      return session;
-    }
-  }
 };
+
+export default NextAuth(authOptions);
