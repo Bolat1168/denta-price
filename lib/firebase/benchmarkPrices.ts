@@ -1,21 +1,35 @@
-﻿import { getFirestore } from 'firebase-admin/firestore';
-import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { db } from './firebaseAdmin';
+import { Timestamp } from 'firebase-admin/firestore';
 
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(JSON.parse(process.env.FIREBASE_ADMIN_KEY || '{}')),
-  });
+export interface BenchmarkPrice {
+  serviceId: string;
+  category: string;
+  serviceNameRU: string;
+  serviceNameKZ?: string;
+  econom: number;
+  comfort: number;
+  optimum: number;
+  premium: number;
+  luxury: number;
+  updatedAt: Timestamp;
 }
 
-const db = getFirestore();
+const BENCHMARK_COLLECTION = 'benchmarkPrices';
 
-export async function benchmarkPrices() {
-  try {
-    const snapshot = await db.collection('prices').get();
-    const prices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return { success: true, data: prices };
-  } catch (error) {
-    console.error('benchmarkPrices error:', error);
-    return { success: false, error: String(error) };
-  }
+export async function upsertBenchmarkPrice(data: Omit<BenchmarkPrice, 'updatedAt'>) {
+  const ref = db.collection(BENCHMARK_COLLECTION).doc(data.serviceId);
+  await ref.set({
+    ...data,
+    updatedAt: Timestamp.now(),
+  }, { merge: true });
+}
+
+export async function getBenchmarkPrice(serviceId: string): Promise<BenchmarkPrice | null> {
+  const doc = await db.collection(BENCHMARK_COLLECTION).doc(serviceId).get();
+  return doc.exists ? (doc.data() as BenchmarkPrice) : null;
+}
+
+export async function getAllBenchmarkPrices(): Promise<BenchmarkPrice[]> {
+  const snapshot = await db.collection(BENCHMARK_COLLECTION).get();
+  return snapshot.docs.map(doc => doc.data() as BenchmarkPrice);
 }
