@@ -1,20 +1,18 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getDisplacementCount } from '@/lib/firebase/promotions';
-import { Timestamp } from 'firebase-admin/firestore';
+import { db } from '@/lib/firebaseadmin';
 
-// Множители для разных радиусов (от цены услуги)
 const RADIUS_MULTIPLIERS: Record<string, number> = {
-  '1': 0.032,   // 3.2% для 1 км
-  '3': 0.048,   // 4.8% для 3 км
-  '6': 0.064,   // 6.4% для 6 км
-  'city': 0.08, // 8% для города
+  '1': 0.032,
+  '3': 0.048,
+  '6': 0.064,
+  'city': 0.08,
 };
 
-// Множители для статусов (вытеснения)
 const MULTIPLIERS = {
-  green: 1.0,   // 0 вытеснений
-  yellow: 1.1,  // 1 вытеснение
-  red: 1.3,     // 2+ вытеснений
+  green: 1.0,
+  yellow: 1.1,
+  red: 1.3,
 };
 
 export async function GET(request: Request) {
@@ -43,6 +41,10 @@ export async function GET(request: Request) {
     }
   }
 
+  if (!db) {
+    return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
+  }
+
   try {
     const radiusKey = String(radius);
     const radiusMultiplier = RADIUS_MULTIPLIERS[radiusKey] || 0.08;
@@ -57,7 +59,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ status: 'red', price: Math.round(baseRate * MULTIPLIERS.red) });
     }
   } catch (error) {
-    console.error('Ошибка при выполнении запроса:', error);
+    console.error('РћС€РёР±РєР° РїСЂРё РІС‹РїРѕР»РЅРµРЅРёРё Р·Р°РїСЂРѕСЃР°:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+

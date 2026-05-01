@@ -802,20 +802,6 @@ export default function DentistCabinetDesktopCompositionPage() {
     
     setServiceRows(prev => {
       const updated = [...prev, newRow];
-      const dentistId = getDentistId();
-      if (dentistId && dentistId !== 'doctor-1') {
-        fetch(`/api/dentists/${dentistId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: profileFullName || '',
-            photoUrl: profilePhotoUrl || '',
-            whatsapp: profileWhatsapp || '',
-            address: profileAddress || '',
-            services: updated,
-          }),
-        }).catch(e => console.error('Save error', e));
-      }
       setTimeout(() => {
         if (newRow.serviceId && newRow.price !== null && newRow.segment && newRow.radiusKm) {
           setPriceLoading(newRow.id, true);
@@ -838,8 +824,8 @@ export default function DentistCabinetDesktopCompositionPage() {
   };
 
   const updateServiceRow = (rowId: string, newServiceId: string) => {
-    setServiceRows(prevRows => {
-      const updated = prevRows.map(row => {
+    setServiceRows(prevRows =>
+      prevRows.map(row => {
         if (row.id === rowId) {
           const nextSegment =
             isMounted && almatyPrices.length > 0 && row.price !== null && newServiceId
@@ -853,23 +839,8 @@ export default function DentistCabinetDesktopCompositionPage() {
           };
         }
         return row;
-      });
-      const dentistId = getDentistId();
-      if (dentistId && dentistId !== 'doctor-1') {
-        fetch(`/api/dentists/${dentistId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: profileFullName || '',
-            photoUrl: profilePhotoUrl || '',
-            whatsapp: profileWhatsapp || '',
-            address: profileAddress || '',
-            services: updated,
-          }),
-        }).catch(e => console.error('Save error', e));
-      }
-      return updated;
-    });
+      })
+    );
 
     setTimeout(() => {
       const updatedRow = serviceRows.find(r => r.id === rowId);
@@ -897,29 +868,14 @@ export default function DentistCabinetDesktopCompositionPage() {
     const currentRow = serviceRows.find(r => r.id === rowId);
     if (currentRow?.price === numericPrice) return;
 
-    setServiceRows(prevRows => {
-      const updated = prevRows.map(row => {
+    setServiceRows(prevRows =>
+      prevRows.map(row => {
         if (row.id === rowId) {
           return { ...row, price: numericPrice };
         }
         return row;
-      });
-      const dentistId = getDentistId();
-      if (dentistId && dentistId !== 'doctor-1') {
-        fetch(`/api/dentists/${dentistId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: profileFullName || '',
-            photoUrl: profilePhotoUrl || '',
-            whatsapp: profileWhatsapp || '',
-            address: profileAddress || '',
-            services: updated,
-          }),
-        }).catch(e => console.error('Save error', e));
-      }
-      return updated;
-    });
+      })
+    );
 
     if (updatePriceAbortControllerRef.current) {
       updatePriceAbortControllerRef.current.abort();
@@ -932,29 +888,14 @@ export default function DentistCabinetDesktopCompositionPage() {
 
     const nextSegment = getSegment(updatedRow.price, updatedRow.serviceId);
     
-    setServiceRows(prevRows => {
-      const updated = prevRows.map(row => {
+    setServiceRows(prevRows =>
+      prevRows.map(row => {
         if (row.id === rowId) {
           return { ...row, segment: nextSegment };
         }
         return row;
-      });
-      const dentistId = getDentistId();
-      if (dentistId && dentistId !== 'doctor-1') {
-        fetch(`/api/dentists/${dentistId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: profileFullName || '',
-            photoUrl: profilePhotoUrl || '',
-            whatsapp: profileWhatsapp || '',
-            address: profileAddress || '',
-            services: updated,
-          }),
-        }).catch(e => console.error('Save error', e));
-      }
-      return updated;
-    });
+      })
+    );
 
     setNicheStatuses(prev => {
       const { [rowId]: _, ...rest } = prev;
@@ -978,8 +919,8 @@ export default function DentistCabinetDesktopCompositionPage() {
   };
 
   const updateServiceRadius = (rowId: string, newRadiusKm: 1 | 3 | 6 | 'city') => {
-    setServiceRows(prevRows => {
-      const updated = prevRows.map(row => {
+    setServiceRows(prevRows =>
+      prevRows.map(row => {
         if (row.id === rowId) {
           return {
             ...row,
@@ -987,23 +928,8 @@ export default function DentistCabinetDesktopCompositionPage() {
           };
         }
         return row;
-      });
-      const dentistId = getDentistId();
-      if (dentistId && dentistId !== 'doctor-1') {
-        fetch(`/api/dentists/${dentistId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: profileFullName || '',
-            photoUrl: profilePhotoUrl || '',
-            whatsapp: profileWhatsapp || '',
-            address: profileAddress || '',
-            services: updated,
-          }),
-        }).catch(e => console.error('Save error', e));
-      }
-      return updated;
-    });
+      })
+    );
 
     setNicheStatuses(prev => {
       const { [rowId]: _, ...rest } = prev;
@@ -1554,7 +1480,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                           <th style={{ height: '40px', verticalAlign: 'top', padding: '4px 16px 12px 16px', width: '40px' }} className="text-center font-medium text-gray-700">
                             <div style={{ fontSize: '13px', lineHeight: '1.2' }}></div>
                           </th>
-                        </table>
+                        </tr>
                       </thead>
                     </table>
                   </div>
@@ -1986,7 +1912,7 @@ export default function DentistCabinetDesktopCompositionPage() {
                             <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>3 км</th>
                             <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>6 км</th>
                             <th style={{ verticalAlign: 'top', fontSize: '12px', padding: '8px' }}>WhatsApp<br />переходы</th>
-                          </tr>
+                           </tr>
                         </thead>
                         <tbody>
                           <tr className="border-b border-gray-100">
@@ -1997,9 +1923,9 @@ export default function DentistCabinetDesktopCompositionPage() {
                             <td style={{ verticalAlign: 'top', fontSize: '14px', lineHeight: '20px', padding: '8px' }}>{analyticsRow ? analyticsRow.views3km?.toLocaleString('ru-RU') ?? '0' : ''}</td>
                             <td style={{ verticalAlign: 'top', fontSize: '14px', lineHeight: '20px', padding: '8px' }}>{analyticsRow ? analyticsRow.views6km?.toLocaleString('ru-RU') ?? '0' : ''}</td>
                             <td style={{ verticalAlign: 'top', fontSize: '14px', lineHeight: '20px', padding: '8px' }}>{analyticsRow ? analyticsRow.whatsappClicks?.toLocaleString('ru-RU') ?? '0' : ''}</td>
-                          </tr>
+                           </tr>
                         </tbody>
-                      </table>
+                       </table>
                     </div>
                   </div>
 
@@ -2937,7 +2863,5 @@ export default function DentistCabinetDesktopCompositionPage() {
         </main>
       </div>
     </>
-  );
-}
   );
 }

@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { upsertBenchmarkPrice } from '@/lib/firebase/benchmarkPrices';
+import { authOptions } from '../../../../lib/auth';
+import { upsertBenchmarkPrice } from '../../../../lib/firebase/benchmarkPrices';
 import * as XLSX from 'xlsx';
 import path from 'path';
 import fs from 'fs/promises';
 
-// Принудительно отключаем статическую генерацию для этого API
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  // Принудительно отключаем проверку типов для сессии, чтобы обойти ошибку 'possibly undefined'
   const session = (await getServerSession(authOptions)) as any;
   
-  // Теперь проверка корректна для компилятора
   if (!session?.user || session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

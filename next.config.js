@@ -1,14 +1,7 @@
-/** @type {import('next').NextConfig} */
-const path = require('path');
-
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    // Добавляем резолвинг для server-side тоже (убран if (!isServer))
-    config.resolve.alias['@'] = path.resolve(__dirname, 'app');
-    config.resolve.modules.push(path.resolve('./'));
-    return config;
-  },
+  swcMinify: false,
 };
 
 module.exports = nextConfig;

@@ -1,8 +1,8 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // Ставки продвижения: множители от цены услуги
-// Для радиуса "город" (city) — 8% от цены услуги
-// Для радиусов 1, 3, 6 км — 3.2%, 4.8%, 6.4% соответственно
+// ля радиуса "город" (city) — 8% от цены услуги
+// ля радиусов 1, 3, 6 км — 3.2%, 4.8%, 6.4% соответственно
 const PROMOTION_MULTIPLIERS = {
   econom: {
     city: 0.08,
@@ -38,7 +38,7 @@ const PROMOTION_MULTIPLIERS = {
 
 export async function GET() {
   try {
-    // Возвращаем данные в формате, который ожидает loadPromotionPrices
+    // озвращаем данные в формате, который ожидает loadPromotionPrices
     // loadPromotionPrices ожидает { multipliers: { [segment]: { [radius]: number } } }
     return NextResponse.json({
       multipliers: PROMOTION_MULTIPLIERS,

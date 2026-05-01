@@ -1,4 +1,4 @@
-import { db } from './firebaseAdmin';
+﻿import { db } from '@/lib/firebaseadmin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 export interface Promotion {
@@ -6,7 +6,7 @@ export interface Promotion {
   dentistId: string;
   serviceId: string;
   segment: string;
-  radius: number | 'city';  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city';  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
   price: number;
   paidAt: Timestamp;
   createdAt: Timestamp;
@@ -31,7 +31,7 @@ export async function createPromotion(data: Omit<Promotion, 'id' | 'createdAt'>)
 export async function getRecentPromotions(
   serviceId: string,
   segment: string,
-  radius: number | 'city',  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city',  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
   minutes: number = 15
 ): Promise<Promotion[]> {
   const now = Timestamp.now();
@@ -51,7 +51,7 @@ export async function getRecentPromotions(
 export async function getDisplacementCount(
   serviceId: string,
   segment: string,
-  radius: number | 'city',  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city',  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
   minutes: number = 15
 ): Promise<number> {
   const now = Timestamp.now();
@@ -67,3 +67,4 @@ export async function getDisplacementCount(
 
   return snapshot.data().count;
 }
+

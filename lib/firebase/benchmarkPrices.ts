@@ -1,4 +1,4 @@
-import { db } from './firebaseAdmin';
+﻿import { db } from '@/lib/firebaseadmin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 export interface BenchmarkPrice {
@@ -33,3 +33,4 @@ export async function getAllBenchmarkPrices(): Promise<BenchmarkPrice[]> {
   const snapshot = await db.collection(BENCHMARK_COLLECTION).get();
   return snapshot.docs.map(doc => doc.data() as BenchmarkPrice);
 }
+

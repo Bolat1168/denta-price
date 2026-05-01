@@ -1,6 +1,6 @@
-﻿import { NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/firebaseadmin';
 
 const ADMIN_KEY = process.env.ADMIN_KEY || 'default-key-change-me';
 const REPORT_EMAIL = process.env.REPORT_EMAIL || '';
@@ -9,7 +9,7 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587');
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
 
-async function sendEmail(to, subject, html) {
+async function sendEmail(to: string, subject: string, html: string) {
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT,
@@ -19,7 +19,7 @@ async function sendEmail(to, subject, html) {
   await transporter.sendMail({ from: SMTP_USER, to, subject, html });
 }
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('X-Admin-Key');
   if (authHeader !== ADMIN_KEY) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -41,7 +41,7 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const dateStr = yesterday.toISOString().split('T')[0];
@@ -70,10 +70,10 @@ export async function GET() {
     if (data.email) {
       await sendEmail(
         data.email,
-        `жедневный отчёт за ${dateStr}`,
-        `<h2>важаемый ${data.name}!</h2>
-         <p>а вчера (${dateStr}) у вас было <b>${data.slots.length}</b> записей.</p>
-         ${data.slots.length > 0 ? '<p>етали: ' + data.slots.map(s => s.time).join(', ') + '</p>' : ''}`
+        `ежедневный отчёт за ${dateStr}`,
+        `<h2>уважаемый ${data.name}!</h2>
+         <p>за вчера (${dateStr}) у вас было <b>${data.slots.length}</b> записей.</p>
+         ${data.slots.length > 0 ? '<p>детали: ' + data.slots.map((s: any) => s.time).join(', ') + '</p>' : ''}`
       );
       sentCount++;
     }

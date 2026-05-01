@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebase/firebaseAdmin';
+﻿import { db } from '@/lib/firebaseadmin';
 import { Timestamp } from 'firebase-admin/firestore';
 
 const LOCKS_COLLECTION = 'paymentLocks';
@@ -9,7 +9,7 @@ export interface PaymentLock {
   dentistId: string;
   serviceId: string;
   segment: string;
-  radius: number | 'city';  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city';  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
   expiresAt: Timestamp;
   createdAt: Timestamp;
 }
@@ -18,7 +18,7 @@ export async function acquireLock(
   dentistId: string,
   serviceId: string,
   segment: string,
-  radius: number | 'city'  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city'  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
 ): Promise<boolean> {
   const now = Timestamp.now();
   const expiresAt = new Timestamp(now.seconds + LOCK_TTL_SECONDS, now.nanoseconds);
@@ -55,7 +55,7 @@ export async function releaseLock(
   dentistId: string,
   serviceId: string,
   segment: string,
-  radius: number | 'city'  // ИЗМЕНЕНО: добавлен 'city'
+  radius: number | 'city'  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
 ): Promise<void> {
   const now = Timestamp.now();
   const snapshot = await db.collection(LOCKS_COLLECTION)
@@ -70,3 +70,4 @@ export async function releaseLock(
   snapshot.docs.forEach(doc => batch.delete(doc.ref));
   await batch.commit();
 }
+

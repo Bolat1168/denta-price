@@ -1,0 +1,40 @@
+﻿node.exe :  тЪа Disabling SWC Minifer will not be an option in th
+e next major version. Please report any issues you may be experie
+ncing to https://github.com/vercel/next.js/issues
+строка:1 знак:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/n
+ode_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo          : NotSpecified: ( тЪа Disabling .../ 
+   next.js/issues:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  тЦ▓ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./app/api/prices/promotion/route.ts
+Error: Failed to read source code from E:\denta-price-live\app\ap
+i\prices\promotion\route.ts
+
+Caused by:
+    stream did not contain valid UTF-8
+
+Import trace for requested module:
+./app/api/prices/promotion/route.ts
+
+./app/contacts/page.tsx
+Error: Failed to read source code from E:\denta-price-live\app\co
+ntacts\page.tsx
+
+Caused by:
+    stream did not contain valid UTF-8
+
+Import trace for requested module:
+./app/contacts/page.tsx
+
+
+> Build failed because of webpack errors

@@ -1,4 +1,4 @@
-﻿export const loadAlmatyPrices = async (): Promise<any[]> => {
+export const loadAlmatyPrices = async (): Promise<any[]> => {
   const res = await fetch('/api/prices/almaty');
   if (!res.ok) throw new Error('Failed to load almaty prices');
   return res.json();
