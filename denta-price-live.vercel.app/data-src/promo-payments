@@ -1,0 +1,41 @@
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "dentistId": "77771234567",
+    "serviceId": "service_001",
+    "segment": "comfort",
+    "radius": 3,
+    "amount": 4500,
+    "status": "PAID",
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "paidAt": "2024-01-15T10:35:22.000Z",
+    "paymentUrl": "",
+    "paymentId": "pay_abc123def456"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "dentistId": "77771234568",
+    "serviceId": "service_002",
+    "segment": "premium",
+    "radius": 6,
+    "amount": 12500,
+    "status": "PENDING",
+    "createdAt": "2024-01-16T14:20:00.000Z",
+    "paidAt": null,
+    "paymentUrl": "",
+    "paymentId": "pay_xyz789uvw012"
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "dentistId": "77771234569",
+    "serviceId": "service_003",
+    "segment": "econom",
+    "radius": 1,
+    "amount": 2500,
+    "status": "PENDING",
+    "createdAt": "2024-01-17T09:15:00.000Z",
+    "paidAt": null,
+    "paymentUrl": "",
+    "paymentId": "pay_mno345pqr678"
+  }
+]

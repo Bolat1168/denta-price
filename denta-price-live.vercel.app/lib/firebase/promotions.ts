@@ -1,0 +1,70 @@
+﻿import { db } from '@/lib/firebaseadmin';
+import { Timestamp } from 'firebase-admin/firestore';
+
+export interface Promotion {
+  id?: string;
+  dentistId: string;
+  serviceId: string;
+  segment: string;
+  radius: number | 'city';  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
+  price: number;
+  paidAt: Timestamp;
+  createdAt: Timestamp;
+}
+
+const PROMOTIONS_COLLECTION = 'promotions';
+
+export async function createPromotion(data: Omit<Promotion, 'id' | 'createdAt'>) {
+  const now = Timestamp.now();
+  
+  const newRef = db.collection(PROMOTIONS_COLLECTION).doc();
+  const promotion: Promotion = {
+    ...data,
+    paidAt: data.paidAt || now,
+    createdAt: now,
+  };
+  
+  await newRef.set(promotion);
+  return newRef.id;
+}
+
+export async function getRecentPromotions(
+  serviceId: string,
+  segment: string,
+  radius: number | 'city',  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
+  minutes: number = 15
+): Promise<Promotion[]> {
+  const now = Timestamp.now();
+  const cutoff = new Timestamp(now.seconds - minutes * 60, now.nanoseconds);
+
+  const snapshot = await db.collection(PROMOTIONS_COLLECTION)
+    .where('serviceId', '==', serviceId)
+    .where('segment', '==', segment)
+    .where('radius', '==', radius)
+    .where('paidAt', '>=', cutoff)
+    .orderBy('paidAt', 'desc')
+    .get();
+
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Promotion));
+}
+
+export async function getDisplacementCount(
+  serviceId: string,
+  segment: string,
+  radius: number | 'city',  // РР—РњР•РќР•РќРћ: РґРѕР±Р°РІР»РµРЅ 'city'
+  minutes: number = 15
+): Promise<number> {
+  const now = Timestamp.now();
+  const cutoff = new Timestamp(now.seconds - minutes * 60, now.nanoseconds);
+
+  const snapshot = await db.collection(PROMOTIONS_COLLECTION)
+    .where('serviceId', '==', serviceId)
+    .where('segment', '==', segment)
+    .where('radius', '==', radius)
+    .where('paidAt', '>=', cutoff)
+    .count()
+    .get();
+
+  return snapshot.data().count;
+}
+

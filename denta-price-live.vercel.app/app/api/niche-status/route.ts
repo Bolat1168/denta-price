@@ -1,0 +1,67 @@
+﻿import { NextResponse } from 'next/server';
+import { getDisplacementCount } from '@/lib/firebase/promotions';
+import { db } from '@/lib/firebaseadmin';
+
+const RADIUS_MULTIPLIERS: Record<string, number> = {
+  '1': 0.032,
+  '3': 0.048,
+  '6': 0.064,
+  'city': 0.08,
+};
+
+const MULTIPLIERS = {
+  green: 1.0,
+  yellow: 1.1,
+  red: 1.3,
+};
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const serviceId = searchParams.get('serviceId');
+  const segment = searchParams.get('segment');
+  const radiusParam = searchParams.get('radius');
+  const priceParam = searchParams.get('price');
+
+  if (!serviceId || !segment || !radiusParam || !priceParam) {
+    return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
+  }
+
+  const price = parseFloat(priceParam);
+  if (isNaN(price) || price <= 0) {
+    return NextResponse.json({ error: 'Invalid price' }, { status: 400 });
+  }
+
+  let radius: number | 'city';
+  if (radiusParam === 'city') {
+    radius = 'city';
+  } else {
+    radius = parseInt(radiusParam, 10);
+    if (isNaN(radius)) {
+      return NextResponse.json({ error: 'Invalid radius' }, { status: 400 });
+    }
+  }
+
+  if (!db) {
+    return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
+  }
+
+  try {
+    const radiusKey = String(radius);
+    const radiusMultiplier = RADIUS_MULTIPLIERS[radiusKey] || 0.08;
+    const baseRate = Math.round(price * radiusMultiplier);
+    const displacementCount = await getDisplacementCount(serviceId, segment, radius, 15);
+
+    if (displacementCount === 0) {
+      return NextResponse.json({ status: 'green', price: baseRate });
+    } else if (displacementCount === 1) {
+      return NextResponse.json({ status: 'yellow', price: Math.round(baseRate * MULTIPLIERS.yellow) });
+    } else {
+      return NextResponse.json({ status: 'red', price: Math.round(baseRate * MULTIPLIERS.red) });
+    }
+  } catch (error) {
+    console.error('РћС€РёР±РєР° РїСЂРё РІС‹РїРѕР»РЅРµРЅРёРё Р·Р°РїСЂРѕСЃР°:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+

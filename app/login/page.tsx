@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
@@ -9,8 +9,17 @@ function LoginContent() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('login_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const googleLogin = useGoogleLogin({
     flow: 'auth-code',
@@ -25,7 +34,7 @@ function LoginContent() {
         });
         const data = await res.json();
         if (res.ok && data.dentistId) {
-          document.cookie = `dentistId=${data.dentistId}; path=/`;
+          document.cookie = `dentistId=${data.dentistId}; path=/; max-age=${60 * 60 * 24 * 30}`;
           router.push(`/dentist-cabinet?id=${data.dentistId}`);
         } else {
           setError(data.error || 'Ошибка входа через Google');
@@ -48,11 +57,15 @@ function LoginContent() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe }),
       });
       const data = await res.json();
       if (res.ok) {
-        document.cookie = `dentistId=${data.dentistId}; path=/`;
+        if (rememberMe && email) {
+          localStorage.setItem('login_email', email);
+        } else {
+          localStorage.removeItem('login_email');
+        }
         router.push(`/dentist-cabinet?id=${data.dentistId}`);
       } else {
         setError(data.error || 'Неверный email или пароль');
@@ -94,16 +107,16 @@ function LoginContent() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1">Email или телефон</label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border rounded px-3 py-2"
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Пароль</label>
             <input
               type="password"
@@ -112,6 +125,20 @@ function LoginContent() {
               className="w-full border rounded px-3 py-2"
               required
             />
+          </div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded"
+              />
+              Запомнить меня
+            </label>
+            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Забыли пароль?
+            </Link>
           </div>
           {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>}
           <button

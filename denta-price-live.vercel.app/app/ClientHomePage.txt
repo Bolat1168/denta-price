@@ -1,0 +1,283 @@
+'use client';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Doctor } from './data/types';
+import { services } from './data/services';
+import DesktopHeader from './components/DesktopHeader';
+import MobileHeader from './components/MobileHeader';
+import LeftSidebarDesktop from './components/LeftSidebarDesktop';
+import RightSidebarDesktop from './components/RightSidebarDesktop';
+import MobileServicesPanel from './components/MobileServicesPanel';
+import { loadAlmatyPrices } from '../pricing/loaders';
+import type { AlmatyServicePrice } from '../pricing/types';
+import Footer from './components/Footer';
+
+function parsePaymentDate(dateStr?: string): number {
+  if (!dateStr) return 0;
+  try {
+    const [datePart, timePart] = dateStr.split(', ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute] = timePart.split(':').map(Number);
+    return new Date(2000 + year, month - 1, day, hour, minute).getTime();
+  } catch { return 0; }
+}
+
+export default function ClientHomePage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<string>('all');
+  const [selectedSegment, setSelectedSegment] = useState<string>('all');
+  const [nearbyOnly, setNearbyOnly] = useState<boolean>(false);
+  const [almatyPrices, setAlmatyPrices] = useState<AlmatyServicePrice[]>([]);
+
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getServiceName = (serviceId: string): string => {
+    const service = services.find(s => s.id === serviceId);
+    return service?.nameKZ || service?.nameRU || '';
+  };
+
+  useEffect(() => {
+    loadAlmatyPrices().then(setAlmatyPrices);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/dentists/public')
+      .then(res => res.json())
+      .then(data => {
+        setDoctors(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load doctors:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const getDoctorForSlot = (radius: string) => {
+    if (nearbyOnly && radius === 'Город') return null;
+    const baseFilter = (d: Doctor) =>
+      (selectedService === 'all' || d.servicesIds.includes(selectedService)) &&
+      (selectedSegment === 'all' || d.segment === selectedSegment);
+    const paid = doctors
+      .filter(d => d.isPaid && d.radius === radius && baseFilter(d))
+      .sort((a, b) => parsePaymentDate(b.paymentDate) - parsePaymentDate(a.paymentDate));
+    if (paid.length > 0) return paid[0];
+    const free = doctors.filter(d => !d.isPaid && d.radius === radius && baseFilter(d));
+    return free.length > 0 ? free[Math.floor(Math.random() * free.length)] : null;
+  };
+
+  const desktopRadii = useMemo(() => {
+    if (nearbyOnly) {
+      return ['6 км', '6 км', '3 км', '3 км', '1 км', '1 км'];
+    }
+    return ['6 км', '6 км', '3 км', '3 км', '1 км', 'Город'];
+  }, [nearbyOnly]);
+
+  const desktopSlots = useMemo(
+    () => desktopRadii.map(r => getDoctorForSlot(r)),
+    [desktopRadii, selectedService, selectedSegment, nearbyOnly, doctors]
+  );
+
+  // Мобильные слоты – исправлено: явный тип для result
+  const mobileSlots = useMemo((): (Doctor | null)[] => {
+    const baseFilter = (d: Doctor) =>
+      (selectedService === 'all' || d.servicesIds.includes(selectedService)) &&
+      (selectedSegment === 'all' || d.segment === selectedSegment);
+
+    if (nearbyOnly) {
+      const radiusOrder = ['6 км', '3 км', '1 км'];
+      return radiusOrder.map(radius => {
+        const filtered = doctors.filter(d => d.isPaid && d.radius === radius && baseFilter(d));
+        filtered.sort((a, b) => parsePaymentDate(b.paymentDate) - parsePaymentDate(a.paymentDate));
+        return filtered[0] || null;
+      });
+    } else {
+      const cityDoctors = doctors.filter(d => d.isPaid && d.radius === 'Город' && baseFilter(d));
+      cityDoctors.sort((a, b) => parsePaymentDate(b.paymentDate) - parsePaymentDate(a.paymentDate));
+      const result: (Doctor | null)[] = [...cityDoctors.slice(0, 3)];
+      while (result.length < 3) result.push(null);
+      return result;
+    }
+  }, [doctors, selectedService, selectedSegment, nearbyOnly]);
+
+  const getSegmentColor = (segment: string) => {
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      econom: { bg: '#9ca3af', text: '#ffffff' },
+      comfort: { bg: '#fbbf24', text: '#000000' },
+      optimum: { bg: '#10b981', text: '#ffffff' },
+      premium: { bg: '#0ea5e9', text: '#ffffff' },
+      luxury: { bg: '#8b5cf6', text: '#ffffff' },
+    };
+    return colorMap[segment] || { bg: '#f3f4f6', text: '#9ca3af' };
+  };
+
+  return (
+    <div className="w-full h-screen flex flex-col overflow-hidden bg-white font-sans">
+      <DesktopHeader />
+      <MobileHeader isMobileMenuOpen={isMobileMenuOpen} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+      <MobileServicesPanel
+        isMobileMenuOpen={isMobileMenuOpen}
+        selectedService={selectedService}
+        setSelectedService={setSelectedService}
+        onClose={() => setIsMobileMenuOpen(false)}
+        setNearbyOnly={setNearbyOnly}
+      />
+
+      <main className="flex-grow w-full overflow-hidden">
+        {/* Десктопная сетка */}
+        <div className="hidden lg:grid grid-cols-[22vw_58vw_20vw] h-full overflow-hidden border-x border-gray-200">
+          <aside className="h-full overflow-y-auto border-r border-gray-200">
+            <LeftSidebarDesktop
+              selectedService={selectedService}
+              setSelectedService={setSelectedService}
+            />
+          </aside>
+
+          <section className="h-full flex flex-col p-4 bg-white">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-rows-2 gap-2 min-h-0">
+              {desktopSlots.map((doctor, idx) => (
+                <div key={idx} className="border border-gray-200 p-2 flex flex-col bg-white h-full min-h-0">
+                  {doctor ? (
+                    <>
+                      <div className="w-3/4 mx-auto aspect-square mb-1 overflow-hidden">
+                        <img src={doctor.photoUrl} alt={doctor.name} className="w-full h-full object-cover object-top border border-gray-200" />
+                      </div>
+                      <div className="ml-[12.5%]">
+                        <h3 className="text-xs font-black uppercase leading-tight text-black text-left">{doctor.name}</h3>
+                        <div className="text-xs font-black uppercase text-black mb-0.5 text-left">
+                          {doctor.price > 0 ? `${doctor.price.toLocaleString('ru-RU')} ₸` : 'ТЕНГЕ / ОТ'}
+                        </div>
+                      </div>
+                      <button onClick={() => window.open(`https://wa.me/${doctor.phone.replace(/\D/g, '')}`, '_blank')}
+                        className="w-full bg-green-600 text-white py-1 rounded-none font-black text-xs uppercase tracking-widest hover:bg-green-700 mt-auto">
+                        ЗАПИСАТЬСЯ
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col h-full min-h-0 opacity-50">
+                      <div className="w-3/4 mx-auto aspect-square mb-1 bg-gray-100"></div>
+                      <div className="ml-[12.5%]">
+                        <h3 className="text-xs font-black uppercase leading-tight text-gray-400 text-left">ФАМИЛИЯ И.О</h3>
+                        <div className="text-xs font-black uppercase text-gray-400 mb-0.5 text-left">ТЕНГЕ / ОТ</div>
+                      </div>
+                      <button className="w-full bg-green-600 text-white py-1 mt-auto cursor-not-allowed opacity-50" disabled>ЗАПИСАТЬСЯ</button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <aside className="h-full overflow-y-auto border-l border-gray-200">
+            <RightSidebarDesktop
+              selectedSegment={selectedSegment}
+              setSelectedSegment={setSelectedSegment}
+              nearbyOnly={nearbyOnly}
+              setNearbyOnly={setNearbyOnly}
+              almatyPrices={almatyPrices}
+              selectedService={selectedService}
+            />
+          </aside>
+        </div>
+
+        {/* Мобильная сетка – исправлено: убран doctor.serviceName */}
+        <div className="lg:hidden h-full overflow-y-auto">
+          <div className="p-4">
+            {/* Сегменты */}
+            <div className="grid grid-cols-5 gap-1 mb-4">
+              {['luxury', 'premium', 'optimum', 'comfort', 'econom'].map((seg) => {
+                const colors: Record<string, string> = {
+                  luxury: 'bg-purple-600',
+                  premium: 'bg-blue-500',
+                  optimum: 'bg-green-500',
+                  comfort: 'bg-yellow-400',
+                  econom: 'bg-gray-400',
+                };
+                const isActive = selectedSegment === seg;
+                return (
+                  <button
+                    key={seg}
+                    onClick={() => setSelectedSegment(selectedSegment === seg ? 'all' : seg)}
+                    className={`${colors[seg]} text-white text-[10px] font-black uppercase py-2 rounded ${
+                      isActive ? 'ring-2 ring-black ring-offset-1' : ''
+                    }`}
+                  >
+                    {seg}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Кнопки City / Рядом */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setNearbyOnly(false)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  !nearbyOnly
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                }`}
+              >
+                City
+              </button>
+              <button
+                onClick={() => setNearbyOnly(true)}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  nearbyOnly
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                }`}
+              >
+                Рядом
+              </button>
+            </div>
+
+            {/* Карточки */}
+            <div className="flex flex-col gap-4">
+              {mobileSlots.map((doctor, index) => {
+                if (doctor) {
+                  return (
+                    <div key={doctor.id} className="border border-gray-200 p-4 bg-white">
+                      <div className="w-24 h-24 mx-auto mb-2 overflow-hidden rounded-full">
+                        <img src={doctor.photoUrl} alt={doctor.name} className="w-full h-full object-cover" />
+                      </div>
+                      <h3 className="text-sm font-black uppercase text-center">{doctor.name}</h3>
+                      <div className="text-xs font-medium text-gray-500 text-center">
+                        {getServiceName(doctor.servicesIds?.[0]) || ''}
+                      </div>
+                      <div className="text-xs font-black text-center mb-2">
+                        {doctor.price > 0 ? `${doctor.price.toLocaleString('ru-RU')} ₸` : 'ТЕНГЕ / ОТ'}
+                      </div>
+                      <button
+                        onClick={() => window.open(`https://wa.me/${doctor.phone.replace(/\D/g, '')}`, '_blank')}
+                        className="w-full bg-green-600 text-white py-2 text-xs font-black uppercase tracking-widest hover:bg-green-700"
+                      >
+                        ЗАПИСАТЬСЯ
+                      </button>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={`empty-${index}`} className="border border-gray-200 p-4 bg-white opacity-50">
+                      <div className="w-24 h-24 mx-auto mb-2 overflow-hidden rounded-full bg-gray-100"></div>
+                      <h3 className="text-sm font-black uppercase text-center text-gray-400">ФАМИЛИЯ И.О</h3>
+                      <div className="text-xs font-medium text-center text-gray-400">УСЛУГА</div>
+                      <div className="text-xs font-black text-center mb-2 text-gray-400">ТЕНГЕ / ОТ</div>
+                      <button
+                        className="w-full bg-green-600 text-white py-2 text-xs font-black uppercase tracking-widest cursor-not-allowed opacity-50"
+                        disabled
+                      >
+                        ЗАПИСАТЬСЯ
+                      </button>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}

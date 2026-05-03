@@ -10,6 +10,8 @@
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
     "@tailwindcss/postcss": "^4.2.4",
+    "@upstash/redis": "^1.37.0",
+    "@vercel/kv": "^3.0.0",
     "autoprefixer": "^10.5.0",
     "bcrypt": "^6.0.0",
     "firebase": "^12.12.1",

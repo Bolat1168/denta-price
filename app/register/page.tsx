@@ -7,7 +7,6 @@ import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 function RegisterContent() {
   const router = useRouter();
-  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -15,22 +14,23 @@ function RegisterContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Google Login
   const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
+    flow: 'auth-code',
+    redirect_uri: 'postmessage',
+    onSuccess: async (codeResponse) => {
       setLoading(true);
       try {
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken: tokenResponse.access_token }),
+          body: JSON.stringify({ code: codeResponse.code }),
         });
         const data = await res.json();
         if (res.ok && data.dentistId) {
-          document.cookie = `dentistId=${data.dentistId}; path=/`;
+          document.cookie = `dentistId=${data.dentistId}; path=/; max-age=${60 * 60 * 24 * 30}`;
           router.push(`/dentist-cabinet?id=${data.dentistId}`);
         } else {
-          setError(data.error || 'Ошибка входа через Google');
+          setError(data.error || 'Ошибка регистрации через Google');
         }
       } catch {
         setError('Ошибка сети');
@@ -38,12 +38,10 @@ function RegisterContent() {
         setLoading(false);
       }
     },
-    onError: () => setError('Ошибка входа через Google'),
-    flow: 'implicit',
+    onError: () => setError('Ошибка регистрации через Google'),
     scope: 'profile email',
   });
 
-  // Обычная регистрация
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,13 +57,18 @@ function RegisterContent() {
       setLoading(false);
       return;
     }
+    if (!email && !phone) {
+      setError('Укажите email или телефон');
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName,
+          fullName: email || phone,
           email: email || undefined,
           phone: phone || undefined,
           password,
@@ -73,7 +76,7 @@ function RegisterContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        document.cookie = `dentistId=${data.dentistId}; path=/`;
+        document.cookie = `dentistId=${data.dentistId}; path=/; max-age=${60 * 60 * 24 * 30}`;
         router.push(`/dentist-cabinet?id=${data.dentistId}`);
       } else {
         setError(data.error || 'Ошибка регистрации');
@@ -86,7 +89,7 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
         <h1 className="text-2xl font-bold mb-6 text-center">Регистрация</h1>
 
@@ -115,37 +118,26 @@ function RegisterContent() {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Ваше имя</label>
+            <label className="block text-sm font-medium mb-1">Email или телефон</label>
             <input
               type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={email || phone}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.includes('@')) {
+                  setEmail(val);
+                  setPhone('');
+                } else {
+                  setPhone(val);
+                  setEmail('');
+                }
+              }}
               className="w-full border rounded px-3 py-2"
-              placeholder="Фамилия Имя"
+              placeholder="email@example.com или +7 (999) 999-99-99"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder="email@example.com"
-            />
-            <p className="text-xs text-gray-500 mt-1">Укажите email или телефон</p>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Телефон</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-              placeholder="+7 (999) 999-99-99"
-            />
-          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Пароль</label>
             <input
@@ -158,7 +150,8 @@ function RegisterContent() {
               minLength={6}
             />
           </div>
-          <div className="mb-4">
+
+          <div className="mb-6">
             <label className="block text-sm font-medium mb-1">Подтверждение пароля</label>
             <input
               type="password"
@@ -169,6 +162,7 @@ function RegisterContent() {
               required
             />
           </div>
+
           {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>}
           <button
             type="submit"

@@ -1,0 +1,32 @@
+export default function DentistCabinetMobilePage() {
+  return (
+    <div className="mobile-version p-4">
+      <h1 className="text-2xl font-bold mb-6">Кабинет дантиста (Мобильная версия)</h1>
+
+      <section className="mb-6 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-2">Profile</h2>
+        <p>Мобильная версия — заглушка профиля</p>
+      </section>
+
+      <section className="mb-6 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-2">Services</h2>
+        <p>Мобильная версия — заглушка услуг</p>
+      </section>
+
+      <section className="mb-6 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-2">Analytics</h2>
+        <p>Мобильная версия — заглушка аналитики</p>
+      </section>
+
+      <section className="mb-6 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-2">Promotion</h2>
+        <p>Мобильная версия — заглушка продвижения</p>
+      </section>
+
+      <section className="mb-6 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-2">Payments</h2>
+        <p>Мобильная версия — заглушка платежей</p>
+      </section>
+    </div>
+  );
+}

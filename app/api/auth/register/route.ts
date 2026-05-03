@@ -1,45 +1,38 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import fs from 'fs/promises';
-import path from 'path';
+import { getDentists, saveDentists } from '@/lib/storage';
 
-const DENTISTS_FILE = path.join(process.cwd(), 'data-src', 'dentists.json');
 const SALT_ROUNDS = 10;
-
-async function readDentists() {
-  try {
-    const data = await fs.readFile(DENTISTS_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function writeDentists(dentists: any[]) {
-  await fs.writeFile(DENTISTS_FILE, JSON.stringify(dentists, null, 2));
-}
 
 export async function POST(req: Request) {
   try {
-    const { fullName, email, phone, password } = await req.json();
+    const { email, phone, password } = await req.json();
 
-    if (!fullName || !password) {
+    if (!password) {
       return NextResponse.json(
-        { error: 'Имя и пароль обязательны' },
+        { error: 'Пароль обязателен' },
         { status: 400 }
       );
     }
 
     if (!email && !phone) {
       return NextResponse.json(
-        { error: 'Необходимо указать email или телефон' },
+        { error: 'Укажите email или телефон' },
         { status: 400 }
       );
     }
 
-    const dentists = await readDentists();
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Пароль должен быть не менее 6 символов' },
+        { status: 400 }
+      );
+    }
 
-    if (email && dentists.some((d: any) => d.email === email)) {
+    const dentists = await getDentists();
+    const normalizedEmail = email ? email.toLowerCase() : null;
+
+    if (normalizedEmail && dentists.some((d: any) => d.email === normalizedEmail)) {
       return NextResponse.json(
         { error: 'Email уже используется' },
         { status: 400 }
@@ -55,10 +48,11 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const newId = `doctor-${Date.now()}`;
+    const login = normalizedEmail || phone;
 
     const newDentist: any = {
       id: newId,
-      fullName,
+      fullName: login,
       passwordHash,
       photoUrl: '/images/doctors/doctor1.png',
       whatsapp: '',
@@ -67,11 +61,11 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    if (email) newDentist.email = email;
+    if (normalizedEmail) newDentist.email = normalizedEmail;
     if (phone) newDentist.phone = phone;
 
     dentists.push(newDentist);
-    await writeDentists(dentists);
+    await saveDentists(dentists);
 
     return NextResponse.json({ dentistId: newId });
   } catch (error) {

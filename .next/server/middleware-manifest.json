@@ -1,0 +1,40 @@
+{
+  "version": 3,
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge-runtime-webpack.js",
+        "server/middleware.js"
+      ],
+      "name": "middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/dentist-cabinet(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/dentist-cabinet/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/login(.json)?[\\/#\\?]?$",
+          "originalSource": "/login"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/register(.json)?[\\/#\\?]?$",
+          "originalSource": "/register"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "47dsYfl-FPR6zCPpjyN5l",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "zzSnLjcp5iBjvF7kp4FvogLmdxO/DlC/iXtTT1a6lJw=",
+        "__NEXT_PREVIEW_MODE_ID": "8ab62f0544fc28ae7ae4f689409afabf",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "caf4e30a547d025256608e8ce57e2a2036e924f13e040613e8509c9ed4bb7a4a",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "16aabb0fe6558ffffd0a64d0fb739fd425156292178caa7a3cebdeff7848870a"
+      }
+    }
+  },
+  "functions": {},
+  "sortedMiddleware": [
+    "/"
+  ]
+}

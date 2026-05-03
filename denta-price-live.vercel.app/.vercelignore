@@ -1,0 +1,5 @@
+.next
+node_modules
+backup_fix
+*.log
+.env.local

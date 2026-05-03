@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import fs from 'fs/promises';
-import path from 'path';
-
-const DENTISTS_FILE = path.join(process.cwd(), 'data-src', 'dentists.json');
+import { getDentists } from '@/lib/storage';
 
 export async function POST(req: Request) {
   try {
-    const { email, phone, password } = await req.json();
+    const { email, phone, password, rememberMe } = await req.json();
 
     if (!password || (!email && !phone)) {
       return NextResponse.json(
@@ -16,11 +13,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await fs.readFile(DENTISTS_FILE, 'utf-8');
-    const dentists = JSON.parse(data);
+    const dentists = await getDentists();
 
     const dentist = dentists.find((d: any) => 
-      (email && d.email === email) || (phone && d.phone === phone)
+      (email && d.email === email.toLowerCase()) || (phone && d.phone === phone)
     );
 
     if (!dentist || !dentist.passwordHash) {
@@ -38,7 +34,18 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({ dentistId: dentist.id });
+    const response = NextResponse.json({ dentistId: dentist.id });
+    
+    const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
+    response.cookies.set('dentistId', dentist.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: maxAge,
+    });
+
+    return response;
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Внутренняя ошибка' }, { status: 500 });
